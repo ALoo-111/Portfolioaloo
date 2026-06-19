@@ -261,3 +261,24 @@ body {
 .game-card:hover .game-card-shine {
   left: 150%;
 }
+
+/* Custom Interactive UX Transition decorations */
+@keyframes scan-line-fast {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes hud-loader {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.animate-scan-line-fast {
+  animation: scan-line-fast 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) infinite;
+}
+
+.animate-hud-loader {
+  animation: hud-loader 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

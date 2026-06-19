@@ -32,6 +32,7 @@ interface GameCardProps {
   accentColor: "green" | "cyan" | "purple";
   icon: React.ComponentType<any>;
   desc: string;
+  image: string;
 }
 
 interface SkillCardProps {
@@ -46,6 +47,7 @@ interface ProjectCardProps {
   title: string;
   desc: string;
   iconName: string;
+  image: string;
 }
 
 // ----------------------------------------------------
@@ -289,7 +291,7 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
 // ----------------------------------------------------
 // Individual Premium Game Card with 3D Tilt & Zoom Placeholders
 // ----------------------------------------------------
-const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: IconComponent, desc }) => {
+const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: IconComponent, desc, image }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -350,19 +352,29 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
       <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[rgba(0,255,136,0.4)]" />
 
       {/* Cybernetic Badge Tag */}
-      <div className={`absolute top-4 right-4 font-mono text-[10px] tracking-[0.15em] px-2 py-[2px] border bg-black/80 ${badgeClasses[accentColor]}`}>
+      <div className={`absolute top-4 right-4 font-mono text-[10px] tracking-[0.15em] px-2 py-[2px] border bg-black/80 z-20 ${badgeClasses[accentColor]}`}>
         {badge}
       </div>
 
       {/* 
-        PREMIUM GAME LOGO PLACEHOLDER WRAPPER (Change Requirement 1)
-        - Replaced simple emojis with beautiful high-tech logo vector blueprint chambers.
-        - Add subtle shine glides, smooth hover scale, grid arrays, & custom matching lasers.
+        PREMIUM GAME LOGO CHAMBER
+        - Implemented real responsive object-cover image with lazy zoom support and no-referrer strategy.
+        - Preserved original animated bounce lasers, grid alignment arrays, corner brackets and shining covers.
       */}
       <div className="relative w-full h-40 bg-black/80 border border-slate-900/80 mb-5 overflow-hidden group/image-slot flex items-center justify-center">
+        {/* Real Game Cover Image */}
+        <img 
+          src={image} 
+          alt={title} 
+          referrerPolicy="no-referrer"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover/image-slot:scale-115"
+        />
+        {/* Semi-transparent cyberpunk dark layout veil */}
+        <div className="absolute inset-0 bg-black/45 transition-colors duration-300 group-hover/image-slot:bg-transparent" />
+
         {/* Abstract futuristic blue-line grid layout backing */}
         <div 
-          className="absolute inset-0 opacity-25" 
+          className="absolute inset-0 opacity-15 pointer-events-none" 
           style={{
             backgroundImage: `radial-gradient(ellipse at center, ${lightGlowTheme}20, transparent 75%), 
                               linear-gradient(0deg, transparent 24%, rgba(0, 255, 136, 0.05) 25%, rgba(0, 255, 136, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 136, 0.05) 75%, rgba(0, 255, 136, 0.05) 76%, transparent 77%), 
@@ -381,29 +393,29 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
         />
 
         {/* Geometric focus metrics inside container boundaries */}
-        <span className="absolute top-2 left-2 text-[8px] font-mono text-slate-500 tracking-wider select-none">
-          SYS_M_REF: {badge}_DEC
+        <span className="absolute top-2 left-2 text-[8px] font-mono text-slate-300/85 tracking-wider select-none bg-black/50 px-1 py-0.5 rounded">
+          HDR_DEC: {badge}_SYS
         </span>
-        <span className="absolute bottom-2 right-2 text-[8px] font-mono text-slate-500 tracking-wider select-none">
-          REPLACE_IMAGE_SLOT
+        <span className="absolute bottom-2 right-2 text-[8px] font-mono text-slate-300/85 tracking-wider select-none bg-black/50 px-1 py-0.5 rounded">
+          SYS_ENG_OK
         </span>
 
-        {/* Vector centerpiece scale/zoom placeholder (Lucide Vector styled flawlessly as logo draft) */}
+        {/* Vector centerpiece watermark styled flawlessly as logo draft */}
         <div 
-          className={`relative z-10 p-4 rounded-full border border-dashed transition-all duration-700 ease-out flex items-center justify-center bg-black/60
-            ${isHovered ? 'scale-115 rotate-6' : 'scale-100'} 
-            ${accentColor === 'green' ? 'border-[#00ff88]/20 group-hover:border-[#00ff88]/60' : ''}
-            ${accentColor === 'cyan' ? 'border-[#00eeff]/20 group-hover:border-[#00eeff]/60' : ''}
-            ${accentColor === 'purple' ? 'border-[#bf5fff]/20 group-hover:border-[#bf5fff]/60' : ''}
+          className={`relative z-10 p-2.5 rounded-full border border-dashed transition-all duration-700 ease-out flex items-center justify-center bg-black/75 backdrop-blur-[1px]
+            ${isHovered ? 'scale-110 rotate-6 border-solid' : 'scale-100'} 
+            ${accentColor === 'green' ? 'border-[#00ff88]/30 group-hover:border-[#00ff88]' : ''}
+            ${accentColor === 'cyan' ? 'border-[#00eeff]/30 group-hover:border-[#00eeff]' : ''}
+            ${accentColor === 'purple' ? 'border-[#bf5fff]/30 group-hover:border-[#bf5fff]' : ''}
           `}
           style={{
-            boxShadow: isHovered ? `0 0 25px ${lightGlowTheme}20` : 'none'
+            boxShadow: isHovered ? `0 0 25px ${lightGlowTheme}40` : 'none'
           }}
         >
           <IconComponent 
-            className="w-12 h-12 transition-all duration-500 ease-all"
+            className="w-7 h-7 transition-all duration-500 ease-all"
             style={{
-              color: isHovered ? lightGlowTheme : 'rgba(122, 255, 184, 0.4)',
+              color: isHovered ? lightGlowTheme : 'rgba(122, 255, 184, 0.75)',
               filter: isHovered ? `drop-shadow(0 0 12px ${lightGlowTheme})` : 'none'
             }}
           />
@@ -413,8 +425,8 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
         <div className="game-card-shine" />
 
         {/* Frame bracket overlays */}
-        <div className="absolute top-2 right-2 w-1 h-1 bg-slate-700" />
-        <div className="absolute bottom-2 left-2 w-1 h-1 bg-slate-700" />
+        <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-slate-500 rounded-sm" />
+        <div className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-slate-500 rounded-sm" />
       </div>
 
       <div className="game-title text-[#00ff88] text-center font-main text-sm font-bold tracking-widest mt-3 uppercase">
@@ -520,7 +532,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ name, icon, level, accent }) => {
 // ----------------------------------------------------
 // Digital Project elements mapped
 // ----------------------------------------------------
-const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName, image }) => {
   return (
     <div className="relative group bg-[rgba(0,255,136,0.03)] border border-[rgba(0,255,136,0.25)] p-6 transition-all duration-300 hover:border-emerald-400 hover:shadow-[0_0_40px_rgba(0,255,136,0.12)]">
       {/* Corner Brackets */}
@@ -529,11 +541,21 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName })
       <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#00ff88]/30" />
       <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#00ff88]/30" />
 
-      {/* Custom pattern mock thumb container */}
-      <div className="relative w-full h-[140px] bg-gradient-to-br from-emerald-900/10 to-black border border-emerald-950 mb-5 overflow-hidden flex items-center justify-center">
+      {/* Real image thumb container */}
+      <div className="relative w-full h-[140px] bg-black border border-emerald-950 mb-5 overflow-hidden flex items-center justify-center group/proj-img">
+        <img 
+          src={image} 
+          alt={title} 
+          referrerPolicy="no-referrer"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" 
+        />
+        {/* Semi-transparent dark overlay */}
+        <div className="absolute inset-0 bg-black/45 transition-colors duration-300 group-hover:bg-transparent" />
+        
         {/* Futuristic scanline grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(0deg,transparent_50%,rgba(0,255,136,0.02)_50%)] bg-[size:100%_4px]" />
-        <span className="text-4xl opacity-50 filter grayscale select-none">{iconName}</span>
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,transparent_50%,rgba(0,255,136,0.02)_50%)] bg-[size:100%_4px] pointer-events-none" />
+        
+        <span className="absolute bottom-3 right-3 text-xl opacity-90 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] select-none bg-black/60 p-1.5 rounded-full border border-emerald-500/20 z-10">{iconName}</span>
       </div>
 
       <div className="font-mono text-[10px] text-emerald-500/50 tracking-widest mb-1">{num}</div>
@@ -560,6 +582,12 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formTransmitting, setFormTransmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  // Landing Screen & Transition states
+  const [enteredDomain, setEnteredDomain] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionStep, setTransitionStep] = useState('');
 
   // Form State Values
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -570,6 +598,70 @@ export default function App() {
 
   // Intersection visibility lists
   const [visibleElements, setVisibleElements] = useState<Record<string, boolean>>({});
+
+  // Sync scroll lock with enteredDomain state
+  useEffect(() => {
+    if (!enteredDomain) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [enteredDomain]);
+
+  // Handle entering the domain with a premium cinematic sequence
+  const handleEnterDomain = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setIsTransitioning(true);
+    setTransitionStep('DECRYPTING SECURITY CERTIFICATE...');
+    
+    setTimeout(() => {
+      setTransitionStep('ESTABLISHING SECURE PROTOCOLS...');
+    }, 450);
+    
+    setTimeout(() => {
+      setTransitionStep('SYNCHRONIZING RECTIFIER MATRICES...');
+    }, 900);
+    
+    setTimeout(() => {
+      setTransitionStep('BOOTING TERMINAL CORE INTERFACE...');
+    }, 1350);
+
+    setTimeout(() => {
+      setEnteredDomain(true);
+      setIsTransitioning(false);
+    }, 1800);
+  };
+
+  // Handle Watching Content trigger with premium transition, then smooth navigation to YouTube
+  const handleWatchContent = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsTransitioning(true);
+    setTransitionStep('REDIRECTING SIGNAL TO BROADCAST TOWER...');
+    
+    setTimeout(() => {
+      setTransitionStep('DIALING SAT-LINK FREQUENCY 141.85...');
+    }, 450);
+
+    setTimeout(() => {
+      setTransitionStep('ESTABLISHING HIGH-BANDWIDTH FEED...');
+    }, 1000);
+
+    setTimeout(() => {
+      setEnteredDomain(true);
+      setIsTransitioning(false);
+      
+      // Give layout rendering time, then scroll straight to the YouTube section
+      setTimeout(() => {
+        const targetElement = document.getElementById('youtube');
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }, 1800);
+  };
 
   useEffect(() => {
     // Standard Loading screen bar count triggers
@@ -631,13 +723,37 @@ export default function App() {
   const handleSubmitContactForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormTransmitting(true);
-    // Simulate high-tech digital channel transmission sweep
-    setTimeout(() => {
+    setFormError(null);
+    setFormSubmitted(false);
+
+    try {
+      const response = await fetch("https://formspree.io/f/xaqzrwdg", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
+        })
+      });
+
+      if (response.ok) {
+        setFormSubmitted(true);
+        setFormData({ name: '', email: '', message: '' });
+        // Auto fade out success message after 7 seconds
+        setTimeout(() => setFormSubmitted(false), 7000);
+      } else {
+        const data = await response.json();
+        setFormError(data.error || "CONNECTION_FAILED: Telemetry core returned non-200 protocol.");
+      }
+    } catch (err: any) {
+      setFormError(err.message || "TRANSMISSION_ERROR: Failed to establish signal link.");
+    } finally {
       setFormTransmitting(false);
-      setFormSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setFormSubmitted(false), 5000);
-    }, 1800);
+    }
   };
 
   return (
@@ -698,9 +814,11 @@ export default function App() {
       {/* ----------------------------------------------------
           NAVIGATION BAR DIRECTIVE ACCENTS (70% Green, 20% Cyan)
          ---------------------------------------------------- */}
-      <nav id="main-nav" className="fixed top-0 left-0 right-0 z-[1000] bg-black/85 border-b border-[rgba(0,255,136,0.25)] backdrop-filter backdrop-blur-md py-4 px-6 md:px-12 transition-all duration-300">
+      <nav id="main-nav" className={`fixed top-0 left-0 right-0 z-[1000] bg-black/85 border-b border-[rgba(0,255,136,0.25)] backdrop-filter backdrop-blur-md py-4 px-6 md:px-12 transition-all duration-700 ${
+        enteredDomain ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+      }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <a href="#hero" className="font-main text-sm font-black text-[#00ff88] tracking-[0.15em] hover:opacity-85 duration-200">
+          <a href="#profile" className="font-main text-sm font-black text-[#00ff88] tracking-[0.15em] hover:opacity-85 duration-200">
             NOOB<span className="text-[#00eeff]">MK</span>GAMER
           </a>
 
@@ -739,7 +857,14 @@ export default function App() {
       {/* ----------------------------------------------------
           HERO LANDING WORKPLACE (Canvas Orbit lines and Matrix Streams)
          ---------------------------------------------------- */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+      <section 
+        id="hero" 
+        className={`transition-all duration-[1200ms] ease-out flex items-center justify-center overflow-hidden ${
+          !enteredDomain 
+            ? "fixed inset-0 z-[95] w-screen h-screen bg-black pt-16" 
+            : "absolute inset-x-0 top-0 h-screen opacity-0 pointer-events-none -translate-y-[35%] scale-95"
+        }`}
+      >
         <MatrixRainStream canvasId="hero-matrix-canvas" />
         <CyberParticleSpace />
 
@@ -759,19 +884,70 @@ export default function App() {
           </div>
 
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="#profile" className="px-8 py-3 text-xs font-main font-bold tracking-[0.15em] uppercase text-black bg-[#00ff88] btn-primary-clip border border-[#00ff88] hover:bg-transparent hover:text-[#00ff88] shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:shadow-[0_0_40px_rgba(0,255,136,0.6)] transition-all duration-300">
+            <button 
+              onClick={handleEnterDomain}
+              className="px-8 py-3 text-xs font-main font-bold tracking-[0.15em] uppercase text-black bg-[#00ff88] btn-primary-clip border border-[#00ff88] hover:bg-transparent hover:text-[#00ff88] shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:shadow-[0_0_40px_rgba(0,255,136,0.6)] transition-all duration-300 cursor-pointer"
+            >
               Enter Domain
-            </a>
-            <a href="#youtube" className="px-8 py-3 text-xs font-main font-bold tracking-[0.15em] uppercase text-[#00eeff] bg-transparent btn-primary-clip border border-[#00eeff] hover:bg-[#00eeff]/10 hover:shadow-[0_0_30px_rgba(0,238,255,0.4)] transition-all duration-300">
+            </button>
+            <button 
+              onClick={handleWatchContent}
+              className="px-8 py-3 text-xs font-main font-bold tracking-[0.15em] uppercase text-[#00eeff] bg-transparent btn-primary-clip border border-[#00eeff] hover:bg-[#00eeff]/10 hover:shadow-[0_0_30px_rgba(0,238,255,0.4)] transition-all duration-300 cursor-pointer"
+            >
               &#9654; Watch Content
-            </a>
+            </button>
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-1">
-          <span className="font-mono text-[9px] text-[#00ff88] tracking-widest">SCROLL</span>
-          <div className="w-5 h-5 border-r border-b border-[#00ff88] rotate-45 transform translate-y-0 animate-bounce" />
-        </div>
+        {/* Cinematic HUD Decryption Scanner Overlay */}
+        {isTransitioning && (
+          <div className="absolute inset-0 bg-black/75 z-50 flex flex-col items-center justify-center pointer-events-none">
+            {/* Grid Calibration Lines */}
+            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,rgba(0,255,136,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,255,136,0.1)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            
+            {/* Rapid vertical laser sweeping line */}
+            <div className="absolute left-0 right-0 h-[4px] bg-gradient-to-r from-transparent via-[#00ff88] to-transparent shadow-[0_0_20px_#00ff88] animate-scan-line-fast" />
+
+            {/* Glowing HUD Bracket Centerpiece */}
+            <div className="relative p-10 border border-[#00ff88]/30 max-w-md w-full bg-black/95 backdrop-blur-md rounded shadow-[0_0_50px_rgba(0,255,136,0.18)] flex flex-col items-center justify-center">
+              {/* Corner brackets */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#00ff88]" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#00ff88]" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#00ff88]" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#00ff88]" />
+              
+              <Terminal className="w-12 h-12 text-[#00eeff] mb-4 animate-pulse-dot" />
+              
+              <div className="font-main text-lg font-black text-[#00ff88] tracking-widest uppercase mb-2">
+                MK SECURITY PORTAL
+              </div>
+              
+              <div className="font-mono text-[10px] text-[#00eeff]/80 uppercase tracking-[0.2em] mb-4">
+                AUTHENTICATING DOMAIN...
+              </div>
+
+              {/* Progress terminal simulator text logs */}
+              <div className="w-full bg-black/80 border border-[#00ff88]/20 p-4 font-mono text-[10px] text-left text-[#7affb8]/90 space-y-2 h-28 overflow-hidden rounded">
+                <div className="text-emerald-400 font-bold">&gt; {transitionStep}</div>
+                <div className="opacity-50">&gt; IP_LOC: INGRESS INTERFACE_GRANTED</div>
+                <div className="opacity-30">&gt; SYS_DECRYPT: RSA_2048 SECURE PROTOCOL</div>
+                <div className="opacity-15">&gt; CONNECT: STATUS_LIVE_READY</div>
+              </div>
+
+              {/* High-tech scanning progress loader indicator bar */}
+              <div className="w-full bg-[#00ff88]/10 h-1 mt-6 overflow-hidden rounded-full">
+                <div className="bg-[#00ff88] h-full shadow-[0_0_10px_#00ff88] animate-hud-loader" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!enteredDomain && (
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-50 animate-pulse">
+            <span className="font-mono text-[9px] text-[#00ff88] tracking-widest">SYSTEM SECURED</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00ff88] shadow-[0_0_8px_#00ff88]" />
+          </div>
+        )}
       </section>
 
       {/* Decorative pulse line separator */}
@@ -810,13 +986,15 @@ export default function App() {
                 <span className="absolute w-[6px] h-[6px] bg-[#00ff88] rounded-full shadow-[0_0_8px_#00ff88] animate-orbit-dot-1" />
                 <span className="absolute w-[6px] h-[6px] bg-[#00eeff] rounded-full shadow-[0_0_8px_#00eeff] animate-orbit-dot-2" />
 
-                <div className="w-full h-full bg-gradient-to-br from-[#061a0e] to-[#0a2014] border-2 border-[rgba(0,255,136,0.25)] flex flex-col items-center justify-center gap-3">
-                  <svg className="w-20 h-20 text-[#00ff88]/40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="36" r="20" stroke="#00ff88" strokeWidth="2" strokeOpacity="0.4" />
-                    <path d="M10 85 Q10 60 50 60 Q90 60 90 85" stroke="#00ff88" strokeWidth="2" strokeOpacity="0.4" fill="none"/>
-                    <circle cx="50" cy="50" r="48" stroke="#00ff88" strokeWidth="1.5" strokeDasharray="6 4" strokeOpacity="0.4" />
-                  </svg>
-                  <span className="font-mono text-[9px] text-[#00ff88]/40 tracking-widest">[ IDENTITY_LOCKED ]</span>
+                <div className="w-full h-full bg-[#031109] border-2 border-[rgba(0,255,136,0.25)] flex items-center justify-center overflow-hidden group/profile-img relative">
+                  <img 
+                    src="/images/profile.jpg" 
+                    alt="NoobMKGamer Profile Avatar" 
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover/profile-img:scale-110"
+                  />
+                  {/* Glowing lens scan lines embedded */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00ff88]/5 to-transparent pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -921,6 +1099,7 @@ export default function App() {
               accentColor="green" 
               icon={Flame} 
               desc="Battle royale survival on the edge. Precision drops, clutch plays, and Booyah moments that define a champion." 
+              image="/images/freefire.jpg"
             />
             <GameCard 
               title="PUBG Mobile" 
@@ -928,6 +1107,7 @@ export default function App() {
               accentColor="cyan" 
               icon={Target} 
               desc="The original battleground. 100 players, one winner. Strategy, patience, and perfect timing are the weapons of choice." 
+              image="/images/pubg.jpg"
             />
             <GameCard 
               title="Clash of Clans" 
@@ -935,6 +1115,7 @@ export default function App() {
               accentColor="green" 
               icon={Swords} 
               desc="Build, destroy, and conquer. Managing clans and raids at the highest level — war is an art form." 
+              image="/images/coc.jpg"
             />
             <GameCard 
               title="GTA" 
@@ -942,6 +1123,7 @@ export default function App() {
               accentColor="purple" 
               icon={Car} 
               desc="Open-world chaos mastered. From heists to street racing — no mission is impossible in the digital city." 
+              image="/images/gta.jpg"
             />
             <GameCard 
               title="Minecraft" 
@@ -949,6 +1131,7 @@ export default function App() {
               accentColor="cyan" 
               icon={Box} 
               desc="From dirt huts to digital empires. Survival mode veteran with builds that defy the laws of pixels." 
+              image="/images/minecraft.jpg"
             />
             <GameCard 
               title="Mobile Legends" 
@@ -956,6 +1139,7 @@ export default function App() {
               accentColor="purple" 
               icon={Shield} 
               desc="MOBA mastery at its peak. Every lane, every hero, every team fight — calculated, dominant, and unstoppable." 
+              image="/images/mlbb.jpg"
             />
           </div>
         </div>
@@ -985,18 +1169,21 @@ export default function App() {
               title="BattleTracker Pro" 
               desc="Real-time battle statistics tracker across multiple games. Monitor K/D ratios, win rates, and performance trends with precision analytics." 
               iconName="📊"
+              image="/images/project1.jpg"
             />
             <ProjectCard 
               num="PROJECT_002" 
               title="Clan Management Hub" 
               desc="All-in-one dashboard for managing clan operations — member tracking, raid scheduling, war logs, and coordination tools." 
               iconName="👥"
+              image="/images/project2.jpg"
             />
             <ProjectCard 
               num="PROJECT_003" 
               title="Loot Analyzer" 
               desc="AI-powered loot optimization tool that calculates best item combinations, rarity probabilities, and optimal drop zone strategies." 
               iconName="🎁"
+              image="/images/project3.jpg"
             />
           </div>
         </div>
@@ -1134,6 +1321,12 @@ export default function App() {
               {formSubmitted && (
                 <div className="p-4 border border-[#00ff88] bg-[#00ff88]/5 text-center font-mono text-xs text-[#00ff88] animate-pulse">
                   ✓ TRANSMISSION SUCCESSFUL — Message received. Standing by...
+                </div>
+              )}
+
+              {formError && (
+                <div className="p-4 border border-[#ff3b3b] bg-[#ff3b3b]/5 text-center font-mono text-xs text-[#ff3b3b] animate-pulse">
+                  ⚠ TRANSMISSION FAILED — {formError}
                 </div>
               )}
             </form>
