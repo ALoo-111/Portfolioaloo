@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-neon-green: #00ff88;
+  --color-neon-cyan: #00eeff;
+  --color-neon-purple: #bf5fff;
+  --color-dark-bg: #000000;
+  
+  --font-main: "Orbitron", monospace;
+  --font-mono: "Share Tech Mono", monospace;
+  --font-body: "Rajdhani", sans-serif;
+}
+
+:root {
+  --neon-green: #00ff88;
+  --neon-cyan: #00eeff;
+  --neon-purple: #bf5fff;
+  --dark-bg: #000000;
+  --panel-bg: rgba(0, 255, 136, 0.04);
+  --border-color: rgba(0, 255, 136, 0.25);
+  --text-primary: #e0ffe8;
+  --text-secondary: #7affb8;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--dark-bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* scanlines */
+.scanline-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 136, 0.015) 2px, rgba(0, 255, 136, 0.015) 4px);
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.9);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--neon-green);
+  border-radius: 3px;
+  box-shadow: 0 0 10px var(--neon-green);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
+}
+
+/* neon glows */
+.glow-green {
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.6), 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 238, 255, 0.6), 0 0 20px rgba(0, 238, 255, 0.3);
+}
+
+.glow-purple {
+  text-shadow: 0 0 10px rgba(191, 95, 255, 0.6), 0 0 20px rgba(191, 95, 255, 0.3);
+}
+
+.border-glow-green {
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.25), inset 0 0 10px rgba(0, 255, 136, 0.05);
+}
+
+.border-glow-cyan {
+  box-shadow: 0 0 15px rgba(0, 238, 255, 0.25), inset 0 0 10px rgba(0, 238, 255, 0.05);
+}
+
+.border-glow-purple {
+  box-shadow: 0 0 15px rgba(191, 95, 255, 0.25), inset 0 0 10px rgba(191, 95, 255, 0.05);
+}
+
+/* glitch effect */
+.glitch {
+  position: relative;
+  display: inline-block;
+  animation: glitch-main 4s infinite;
+}
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.glitch::before {
+  color: var(--neon-cyan);
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+  animation: glitch-top 4s infinite;
+}
+.glitch::after {
+  color: var(--neon-purple);
+  clip-path: polygon(0 66%, 100% 66%, 100% 100%, 0 100%);
+  animation: glitch-bottom 4s infinite;
+}
+
+@keyframes glitch-main {
+  0%,90%,100%{transform:translate(0)}
+  92%{transform:translate(-2px,1px)}
+  94%{transform:translate(2px,-1px)}
+  96%{transform:translate(0)}
+}
+@keyframes glitch-top {
+  0%,90%,100%{transform:translate(0)}
+  92%{transform:translate(3px,0)}
+  94%{transform:translate(-3px,0)}
+  96%{transform:translate(0)}
+}
+@keyframes glitch-bottom {
+  0%,90%,100%{transform:translate(0)}
+  92%{transform:translate(-3px,0)}
+  94%{transform:translate(3px,0)}
+  96%{transform:translate(0)}
+}
+
+/* custom cursor */
+#cursor {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  background: var(--neon-green);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  box-shadow: 0 0 12px var(--neon-green), 0 0 24px var(--neon-green);
+  transition: transform 0.1s, background 0.2s;
+  will-change: transform, left, top;
+}
+#cursor-ring {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(0,255,136,0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: all 0.15s ease;
+  will-change: left, top;
+}
+.cursor-trail {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  transform: translate(-50%,-50%);
+  background: var(--neon-green);
+  opacity: 0.6;
+}
+
+/* animations */
+@keyframes ring-rotate {
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+@keyframes scan-line {
+  0%,100%{top:0;opacity:0.8}
+  50%{top:100%;opacity:0.4}
+}
+@keyframes pulse-dot {
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.5;transform:scale(0.8)}
+}
+@keyframes orbit-dot {
+  0%{top:50%;left:-3px;transform:translateY(-50%)}
+  25%{top:-3px;left:50%;transform:translateX(-50%)}
+  50%{top:50%;left:calc(100% - 3px);transform:translateY(-50%)}
+  75%{top:calc(100% - 3px);left:50%;transform:translateX(-50%)}
+  100%{top:50%;left:-3px;transform:translateY(-50%)}
+}
+
+.animate-ring-rotate {
+  animation: ring-rotate 8s linear infinite;
+}
+.animate-ring-rotate-reverse {
+  animation: ring-rotate 12s linear infinite reverse;
+}
+.animate-scan-line {
+  animation: scan-line 3s ease-in-out infinite;
+}
+.animate-pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+.animate-orbit-dot-1 {
+  animation: orbit-dot 4s linear infinite;
+}
+.animate-orbit-dot-2 {
+  animation: orbit-dot 6s linear infinite -2s;
+}
+
+/* shine and gradient layouts */
+.neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+@keyframes neon-pulse {
+  0%,100%{box-shadow:0 0 10px rgba(0,255,136,0.3)}
+  50%{box-shadow:0 0 30px rgba(0,255,136,0.7)}
+}
+
+.hologram-gradient {
+  background: linear-gradient(45deg, rgba(0,255,136,0.05), rgba(0,238,255,0.05), rgba(191,95,255,0.05));
+  background-size: 400% 400%;
+  animation: hologram-shift 6s ease infinite;
+}
+@keyframes hologram-shift {
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+.btn-primary-clip {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.btn-yt-clip {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+/* Game Card shine sweeping effect */
+.game-card-shine {
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(0, 255, 136, 0.15) 30%,
+    rgba(0, 238, 255, 0.15) 70%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: 0.75s;
+}
+
+.game-card:hover .game-card-shine {
+  left: 150%;
+}
