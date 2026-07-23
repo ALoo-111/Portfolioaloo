@@ -1046,7 +1046,6 @@ export default function App() {
           {/* Removed Visual Label prefix "// skills_matrix.dat" */}
           <div className="text-center mb-16">
             <span className="font-main text-[11px] tracking-[0.4em] text-[#00eeff] block mb-2 uppercase glow-cyan">
-              SKILLS MATRIX
             </span>
             <h2 className="font-main font-black text-2xl md:text-4xl text-zinc-100 tracking-wider uppercase">
               CORE <span className="text-[#00ff88] glow-green">SKILLS</span>
@@ -1081,7 +1080,6 @@ export default function App() {
           */}
           <div className="text-center mb-16">
             <span className="font-main text-[11px] tracking-[0.4em] text-[#00eeff] block mb-2 uppercase glow-cyan">
-              GAME LIBRARY
             </span>
             <h2 className="font-main font-black text-2xl md:text-4xl text-zinc-100 tracking-wider uppercase">
               FEATURED <span className="text-[#00ff88] glow-green">GAMES</span>
