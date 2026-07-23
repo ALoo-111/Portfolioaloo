@@ -964,8 +964,7 @@ export default function App() {
             - Upgraded with custom uppercase typography, letters matching Orbitron, and neon vector underlines. 
           */}
           <div className="text-center mb-16">
-            <span className="font-main text-[11px] tracking-[0.4em] text-[#00eeff] block mb-2 uppercase glow-cyan">
-              PLAYER PROFILE
+            <span className="font-main text-[11px] tracking-[0.4em] text-[#00eeff] block mb-2 uppercase glow-cyan"
             </span>
             <h2 className="font-main font-black text-2xl md:text-4xl text-zinc-100 tracking-wider uppercase">
               PLAYER <span className="text-[#00ff88] glow-green">PROFILE</span>
@@ -1150,8 +1149,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto">
           {/* Removed Visual Label prefix "// projects_hub.dat" */}
           <div className="text-center mb-16">
-            <span className="font-main text-[11px] tracking-[0.4em] text-[#00eeff] block mb-2 uppercase glow-cyan">
-              PROJECTS PORTFOLIO
+            <span className="font-main text-[11px] tracking-[0.4em] text-[#00eeff] block mb-2 uppercase glow-cyan"
             </span>
             <h2 className="font-main font-black text-2xl md:text-4xl text-zinc-100 tracking-wider uppercase">
               DIGITAL <span className="text-[#00ff88] glow-green">PROJECTS</span>
@@ -1194,8 +1192,7 @@ export default function App() {
         <div className="max-w-4xl mx-auto text-center">
           {/* Removed Visual Label prefix "// broadcast_channel.link" */}
           <div className="text-center mb-16">
-            <span className="font-main text-[11px] tracking-[0.4em] text-[#bf5fff] block mb-2 uppercase glow-purple">
-              YOUTUBE CHANNEL
+            <span className="font-main text-[11px] tracking-[0.4em] text-[#bf5fff] block mb-2 uppercase glow-purple"
             </span>
             <h2 className="font-main font-black text-2xl md:text-4xl text-zinc-100 tracking-wider uppercase">
               YOUTUBE <span className="text-[#bf5fff] glow-purple">CHANNEL</span>
@@ -1246,8 +1243,7 @@ export default function App() {
             - Refactored using typography and purple glow effects.
           */}
           <div className="text-center mb-16">
-            <span className="font-main text-[11px] tracking-[0.4em] text-[#bf5fff] block mb-2 uppercase glow-purple">
-              CONTACT
+            <span className="font-main text-[11px] tracking-[0.4em] text-[#bf5fff] block mb-2 uppercase glow-purple"
             </span>
             <h2 className="font-main font-black text-2xl md:text-4xl text-zinc-100 tracking-wider uppercase">
               ESTABLISH <span className="text-[#bf5fff] glow-purple">CONNECTION</span>
@@ -1358,12 +1354,7 @@ export default function App() {
               key={social} 
               href="#" 
               onClick={(e) => e.preventDefault()}
-              className="w-10 h-10 border border-emerald-500/30 hover:border-[#00ff88] text-emerald-500/55 hover:text-[#00ff88] hover:shadow-[0_0_15px_rgba(0,255,136,0.3)] transition-all duration-300 flex items-center justify-center text-xs"
-            >
-              {social === 'youtube' && '▶'}
-              {social === 'instagram' && '✦'}
-              {social === 'twitter' && '✕'}
-              {social === 'discord' && '●'}
+              className="w-10 h-10 border border-emerald-500/30 hover:border-[#00ff88] text-emerald-500/55 hover:text-[#00ff88] hover:shadow-[0_0_15px_rgba(0,255,136,0.3)] transition-all duration-300 flex items-center justify-center text-xs
             </a>
           ))}
         </div>
