@@ -1020,8 +1020,6 @@ export default function App() {
                   { label: "Classification", val: "Digital Entity" },
                   { label: "Location", val: "Internet" },
                   { label: "Status", val: "Online", isStatus: true },
-                  { label: "Experience", val: "All Games" },
-                  { label: "Education", val: "Topper Hi Khada Hai" },
                   { label: "Skills", val: "Undefined In Words" }
                 ].map((row, i) => (
                   <div key={i} className="flex justify-between py-2 border-b border-emerald-500/5">
