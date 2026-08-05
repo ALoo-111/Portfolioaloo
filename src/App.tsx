@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Flame, 
-  Target, 
-  Swords, 
-  Car, 
-  Box, 
-  Shield, 
-  Play, 
-  Mail, 
-  Gamepad2, 
-  User, 
-  Cpu, 
-  Map, 
-  Award, 
-  ArrowDown, 
-  Instagram, 
-  Twitter, 
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+import {
+  Flame,
+  Target,
+  Swords,
+  Car,
+  Box,
+  Shield,
+  Play,
+  Mail,
+  Gamepad2,
+  User,
+  Cpu,
+  Map,
+  Award,
+  ArrowDown,
+  Instagram,
+  Twitter,
   Layers,
   Send,
   Sparkles,
@@ -49,6 +50,167 @@ interface ProjectCardProps {
   iconName: string;
   image: string;
 }
+
+
+interface MagneticAnchorProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 34, scale: 0.985, filter: 'blur(14px)' },
+  visible: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
+};
+
+const MagneticAnchor: React.FC<MagneticAnchorProps> = ({ children, className = '' }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 240, damping: 18, mass: 0.34 });
+  const springY = useSpring(y, { stiffness: 240, damping: 18, mass: 0.34 });
+
+  const handleMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const node = ref.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    x.set((event.clientX - rect.left - rect.width / 2) * 0.28);
+    y.set((event.clientY - rect.top - rect.height / 2) * 0.28);
+  };
+
+  const reset = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={reset}
+      style={{ x: springX, y: springY }}
+      whileTap={{ scale: 0.97 }}
+      className={`magnetic-shell ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+const PremiumThreeBackdrop: React.FC = () => {
+  const mountRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const mount = mountRef.current;
+    if (!mount) return;
+    let cleanup = () => {};
+    let cancelled = false;
+
+    const bootScene = async () => {
+      try {
+        const THREE = await new Function("return import('three').catch(() => import('https://esm.sh/three@0.168.0'))")();
+        if (cancelled || !mount) return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(55, mount.clientWidth / Math.max(mount.clientHeight, 1), 0.1, 100);
+        camera.position.set(0, 0, 7.6);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(mount.clientWidth, mount.clientHeight);
+        renderer.domElement.setAttribute('aria-hidden', 'true');
+        renderer.domElement.className = 'premium-three-canvas';
+        mount.appendChild(renderer.domElement);
+
+        const group = new THREE.Group();
+        scene.add(group);
+
+        const geometry = new THREE.IcosahedronGeometry(1, 2);
+        const torusGeometry = new THREE.TorusKnotGeometry(0.62, 0.16, 96, 12);
+        const materials = ['#74f7ff', '#c084fc', '#ff72d2', '#60a5fa', '#00ff88'].map((color) =>
+          new THREE.MeshPhysicalMaterial({ color, roughness: 0.08, metalness: 0.16, transmission: 0.62, thickness: 1.15, ior: 1.5, transparent: true, opacity: 0.44, clearcoat: 1, clearcoatRoughness: 0.08 })
+        );
+
+        Array.from({ length: 9 }).forEach((_, index) => {
+          const mesh = new THREE.Mesh(index % 3 === 0 ? torusGeometry : geometry, materials[index % materials.length]);
+          mesh.position.set((Math.random() - 0.5) * 9, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5);
+          const scale = 0.25 + Math.random() * 0.65;
+          mesh.scale.setScalar(scale);
+          group.add(mesh);
+        });
+
+        const particleGeometry = new THREE.BufferGeometry();
+        const count = window.innerWidth < 768 ? 260 : 820;
+        const positions = new Float32Array(count * 3);
+        for (let i = 0; i < count * 3; i += 3) {
+          positions[i] = (Math.random() - 0.5) * 14;
+          positions[i + 1] = (Math.random() - 0.5) * 8;
+          positions[i + 2] = (Math.random() - 0.5) * 8;
+        }
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particles = new THREE.Points(
+          particleGeometry,
+          new THREE.PointsMaterial({ color: '#dff8ff', size: 0.022, transparent: true, opacity: 0.72, depthWrite: false })
+        );
+        scene.add(particles);
+
+        scene.add(new THREE.AmbientLight('#dff8ff', 1.9));
+        const rimLight = new THREE.DirectionalLight('#74f7ff', 2.6);
+        rimLight.position.set(-3, 2, 4);
+        scene.add(rimLight);
+        const light = new THREE.PointLight('#ff72d2', 16, 22);
+        light.position.set(2.5, 1.5, 4);
+        scene.add(light);
+
+        let frame = 0;
+        const animate = () => {
+          frame = requestAnimationFrame(animate);
+          group.rotation.y += 0.0032;
+          group.rotation.x += 0.0012;
+          group.children.forEach((child: any, index: number) => {
+            child.rotation.x += 0.002 + index * 0.00008;
+            child.rotation.z -= 0.0015 + index * 0.00005;
+            child.position.y += Math.sin(Date.now() * 0.00045 + index) * 0.0009;
+          });
+          particles.rotation.y -= 0.0009;
+          particles.rotation.x += 0.00035;
+          light.position.x = Math.sin(Date.now() * 0.0006) * 3;
+          light.position.y = Math.cos(Date.now() * 0.0004) * 2;
+          renderer.render(scene, camera);
+        };
+        animate();
+
+        const resize = () => {
+          camera.aspect = mount.clientWidth / Math.max(mount.clientHeight, 1);
+          camera.updateProjectionMatrix();
+          renderer.setSize(mount.clientWidth, mount.clientHeight);
+        };
+        window.addEventListener('resize', resize);
+
+        cleanup = () => {
+          cancelAnimationFrame(frame);
+          window.removeEventListener('resize', resize);
+          renderer.dispose();
+          geometry.dispose();
+          particleGeometry.dispose();
+          torusGeometry.dispose();
+          materials.forEach((material) => material.dispose());
+          if (renderer.domElement.parentElement === mount) mount.removeChild(renderer.domElement);
+        };
+      } catch {
+        mount.classList.add('premium-three-fallback');
+      }
+    };
+
+    bootScene();
+
+    return () => {
+      cancelled = true;
+      cleanup();
+    };
+  }, []);
+
+  return <div ref={mountRef} className="premium-three-backdrop" aria-hidden="true" />;
+};
 
 // ----------------------------------------------------
 // Custom 3D Projected Canvas Background Component
@@ -313,7 +475,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
     setIsHovered(false);
   };
 
-  // Color mappings honoring specified exact ratios: 
+  // Color mappings honoring specified exact ratios:
   // 70% Neon Green (Primary), 20% Neon Cyan (Alt), 10% Neon Purple (Legend/Highlights)
   const badgeClasses = {
     green: "text-[#00ff88] border-[rgba(0,255,136,0.35)] shadow-[0_0_8px_rgba(0,255,136,0.25)]",
@@ -356,16 +518,16 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
         {badge}
       </div>
 
-      {/* 
+      {/*
         PREMIUM GAME LOGO CHAMBER
         - Implemented real responsive object-cover image with lazy zoom support and no-referrer strategy.
         - Preserved original animated bounce lasers, grid alignment arrays, corner brackets and shining covers.
       */}
       <div className="relative w-full h-40 bg-black/80 border border-slate-900/80 mb-5 overflow-hidden group/image-slot flex items-center justify-center">
         {/* Real Game Cover Image */}
-        <img 
-          src={image} 
-          alt={title} 
+        <img
+          src={image}
+          alt={title}
           referrerPolicy="no-referrer"
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover/image-slot:scale-115"
         />
@@ -373,18 +535,18 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
         <div className="absolute inset-0 bg-black/45 transition-colors duration-300 group-hover/image-slot:bg-transparent" />
 
         {/* Abstract futuristic blue-line grid layout backing */}
-        <div 
-          className="absolute inset-0 opacity-15 pointer-events-none" 
+        <div
+          className="absolute inset-0 opacity-15 pointer-events-none"
           style={{
-            backgroundImage: `radial-gradient(ellipse at center, ${lightGlowTheme}20, transparent 75%), 
-                              linear-gradient(0deg, transparent 24%, rgba(0, 255, 136, 0.05) 25%, rgba(0, 255, 136, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 136, 0.05) 75%, rgba(0, 255, 136, 0.05) 76%, transparent 77%), 
+            backgroundImage: `radial-gradient(ellipse at center, ${lightGlowTheme}20, transparent 75%),
+                              linear-gradient(0deg, transparent 24%, rgba(0, 255, 136, 0.05) 25%, rgba(0, 255, 136, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 136, 0.05) 75%, rgba(0, 255, 136, 0.05) 76%, transparent 77%),
                               linear-gradient(90deg, transparent 24%, rgba(0, 255, 136, 0.05) 25%, rgba(0, 255, 136, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 136, 0.05) 75%, rgba(0, 255, 136, 0.05) 76%, transparent 77%)`,
             backgroundSize: '100% 100%, 15px 15px, 15px 15px'
           }}
         />
 
         {/* Dynamic laser scan lines moving inside the placeholder chamber */}
-        <div 
+        <div
           className="absolute left-0 right-0 h-[1.5px] opacity-60 animate-bounce duration-5000"
           style={{
             background: `linear-gradient(90deg, transparent, ${lightGlowTheme}, transparent)`,
@@ -401,9 +563,9 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
         </span>
 
         {/* Vector centerpiece watermark styled flawlessly as logo draft */}
-        <div 
+        <div
           className={`relative z-10 p-2.5 rounded-full border border-dashed transition-all duration-700 ease-out flex items-center justify-center bg-black/75 backdrop-blur-[1px]
-            ${isHovered ? 'scale-110 rotate-6 border-solid' : 'scale-100'} 
+            ${isHovered ? 'scale-110 rotate-6 border-solid' : 'scale-100'}
             ${accentColor === 'green' ? 'border-[#00ff88]/30 group-hover:border-[#00ff88]' : ''}
             ${accentColor === 'cyan' ? 'border-[#00eeff]/30 group-hover:border-[#00eeff]' : ''}
             ${accentColor === 'purple' ? 'border-[#bf5fff]/30 group-hover:border-[#bf5fff]' : ''}
@@ -412,7 +574,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
             boxShadow: isHovered ? `0 0 25px ${lightGlowTheme}40` : 'none'
           }}
         >
-          <IconComponent 
+          <IconComponent
             className="w-7 h-7 transition-all duration-500 ease-all"
             style={{
               color: isHovered ? lightGlowTheme : 'rgba(122, 255, 184, 0.75)',
@@ -438,7 +600,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
       </div>
 
       {/* Glow horizontal micro bar on hover trigger */}
-      <div 
+      <div
         className="absolute bottom-0 left-0 right-0 h-[2px] transition-transform duration-500"
         style={{
           background: `linear-gradient(90deg, transparent, ${lightGlowTheme}, transparent)`,
@@ -517,7 +679,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ name, icon, level, accent }) => {
         {name}
       </div>
       <div className="w-full bg-[rgba(0,255,136,0.15)] h-[3px] rounded-full mt-3 overflow-hidden">
-        <div 
+        <div
           className={`h-full bg-gradient-to-r rounded-full transition-all duration-300 ${accStyles.bar}`}
           style={{ width: `${percent}%` }}
         />
@@ -543,18 +705,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName, i
 
       {/* Real image thumb container */}
       <div className="relative w-full h-[140px] bg-black border border-emerald-950 mb-5 overflow-hidden flex items-center justify-center group/proj-img">
-        <img 
-          src={image} 
-          alt={title} 
+        <img
+          src={image}
+          alt={title}
           referrerPolicy="no-referrer"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" 
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
         {/* Semi-transparent dark overlay */}
         <div className="absolute inset-0 bg-black/45 transition-colors duration-300 group-hover:bg-transparent" />
-        
+
         {/* Futuristic scanline grid overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(0deg,transparent_50%,rgba(0,255,136,0.02)_50%)] bg-[size:100%_4px] pointer-events-none" />
-        
+
         <span className="absolute bottom-3 right-3 text-xl opacity-90 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] select-none bg-black/60 p-1.5 rounded-full border border-emerald-500/20 z-10">{iconName}</span>
       </div>
 
@@ -562,9 +724,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName, i
       <div className="font-main text-xs font-bold text-[#00ff88] tracking-wider mb-2 uppercase">{title}</div>
       <p className="font-body text-[13px] text-zinc-400 leading-relaxed mb-4">{desc}</p>
 
-      <a 
-        href="#" 
-        onClick={(e) => e.preventDefault()} 
+      <a
+        href="#"
+        onClick={(e) => e.preventDefault()}
         className="inline-block px-4 py-2 text-[10px] font-main font-bold tracking-widest text-[#00ff88] border border-emerald-500/40 hover:bg-emerald-950/20 hover:shadow-[0_0_15px_rgba(0,255,136,0.2)] transition-all duration-300"
       >
         &#9654; VIEW DEMO
@@ -616,15 +778,15 @@ export default function App() {
     if (e) e.preventDefault();
     setIsTransitioning(true);
     setTransitionStep('DECRYPTING SECURITY CERTIFICATE...');
-    
+
     setTimeout(() => {
       setTransitionStep('ESTABLISHING SECURE PROTOCOLS...');
     }, 450);
-    
+
     setTimeout(() => {
       setTransitionStep('SYNCHRONIZING RECTIFIER MATRICES...');
     }, 900);
-    
+
     setTimeout(() => {
       setTransitionStep('BOOTING TERMINAL CORE INTERFACE...');
     }, 1350);
@@ -640,7 +802,7 @@ export default function App() {
     e.preventDefault();
     setIsTransitioning(true);
     setTransitionStep('REDIRECTING SIGNAL TO BROADCAST TOWER...');
-    
+
     setTimeout(() => {
       setTransitionStep('DIALING SAT-LINK FREQUENCY 141.85...');
     }, 450);
@@ -652,7 +814,7 @@ export default function App() {
     setTimeout(() => {
       setEnteredDomain(true);
       setIsTransitioning(false);
-      
+
       // Give layout rendering time, then scroll straight to the YouTube section
       setTimeout(() => {
         const targetElement = document.getElementById('youtube');
@@ -662,6 +824,74 @@ export default function App() {
       }, 100);
     }, 1800);
   };
+
+  useEffect(() => {
+    let context: any;
+    let cancelled = false;
+
+    const bootGsap = async () => {
+      try {
+        const { gsap } = await new Function("return import('gsap').catch(() => import('https://esm.sh/gsap@3.12.5'))")();
+        if (cancelled) return;
+        context = gsap.context(() => {
+          gsap.fromTo(
+            '.scroll-reveal',
+            { y: 44, opacity: 0.72, scale: 0.985 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out', stagger: 0.08 }
+          );
+          gsap.to('.premium-aurora-field', {
+            backgroundPosition: '60% 40%',
+            duration: 18,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+          });
+        });
+      } catch {
+        document.documentElement.classList.add('gsap-fallback');
+      }
+    };
+
+    bootGsap();
+
+    return () => {
+      cancelled = true;
+      if (context) context.revert();
+    };
+  }, []);
+
+  useEffect(() => {
+    const tiltTargets = Array.from(document.querySelectorAll<HTMLElement>('.game-card, #skills .grid > div, #projects .grid > div, #youtube .bg-gradient-to-br, #contact > div > div:last-child, #profile .grid > div:last-child'));
+
+    const handleTiltMove = (event: MouseEvent) => {
+      tiltTargets.forEach((target) => {
+        const rect = target.getBoundingClientRect();
+        const isInside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+        if (!isInside) return;
+        const rotateX = ((event.clientY - rect.top) / rect.height - 0.5) * -7;
+        const rotateY = ((event.clientX - rect.left) / rect.width - 0.5) * 7;
+        target.style.setProperty('--tilt-x', `${rotateX}deg`);
+        target.style.setProperty('--tilt-y', `${rotateY}deg`);
+        target.style.setProperty('--tilt-glow-x', `${event.clientX - rect.left}px`);
+        target.style.setProperty('--tilt-glow-y', `${event.clientY - rect.top}px`);
+      });
+    };
+
+    const resetTilt = () => {
+      tiltTargets.forEach((target) => {
+        target.style.setProperty('--tilt-x', '0deg');
+        target.style.setProperty('--tilt-y', '0deg');
+      });
+    };
+
+    window.addEventListener('mousemove', handleTiltMove, { passive: true });
+    window.addEventListener('mouseout', resetTilt, { passive: true });
+
+    return () => {
+      window.removeEventListener('mousemove', handleTiltMove);
+      window.removeEventListener('mouseout', resetTilt);
+    };
+  }, [enteredDomain]);
 
   useEffect(() => {
     // Standard Loading screen bar count triggers
@@ -757,25 +987,30 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black text-[#e0ffe8] overflow-hidden selection:bg-[#00ff88] selection:text-black font-body">
-      
+    <motion.div initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} className="premium-app-shell relative min-h-screen bg-black text-[#e0ffe8] overflow-hidden selection:bg-[#00ff88] selection:text-black font-body">
+      <PremiumThreeBackdrop />
+      <div className="premium-aurora-field" aria-hidden="true" />
+      <div className="premium-depth-orbs" aria-hidden="true"><span /><span /><span /><span /></div>
+      <div className="premium-noise-layer" aria-hidden="true" />
+      <div className="mouse-spotlight" style={{ '--spotlight-x': `${cursorPos.x}px`, '--spotlight-y': `${cursorPos.y}px` } as React.CSSProperties} aria-hidden="true" />
+
       {/* Absolute scanline noise grids */}
       <div className="scanline-overlay pointer-events-none" />
 
       {/* Complete Hover Follower pointer systems (Change constraint) */}
-      <div 
-        id="cursor" 
+      <div
+        id="cursor"
         className="hidden md:block"
-        style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }} 
+        style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }}
       />
-      <div 
-        id="cursor-ring" 
+      <div
+        id="cursor-ring"
         className="hidden md:block"
-        style={{ 
-          left: `${cursorRingPos.x}px`, 
+        style={{
+          left: `${cursorRingPos.x}px`,
           top: `${cursorRingPos.y}px`,
           transform: `translate(-50%, -50%)`
-        }} 
+        }}
       />
 
       {/* ----------------------------------------------------
@@ -784,12 +1019,12 @@ export default function App() {
       {isLoading && (
         <div className="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-6">
           <MatrixRainStream canvasId="loading-matrix" alpha="rgba(0,0,0,0.06)" />
-          
+
           <div className="relative z-10 text-center max-w-md w-full">
             <h1 className="glitch font-main text-2xl md:text-4xl font-black text-[#00ff88] tracking-[0.2em] mb-8" data-text="NOOBMKGAMER">
               NOOBMKGAMER
             </h1>
-            
+
             <div className="space-y-2 text-[11px] font-mono text-[#00ff88]/80 text-left bg-black/60 p-4 border border-[#00ff88]/20 rounded mb-8">
               <div className="text-[#00eeff]">&gt; INITIALIZING DOMAIN CORE ENGINE...</div>
               {loadPercentage > 25 && <div>&gt; SCANNING COMPILER AND DIRECTIVES... OK</div>}
@@ -799,8 +1034,8 @@ export default function App() {
             </div>
 
             <div className="w-full bg-[rgba(0,255,136,0.15)] h-[4px] rounded-full overflow-hidden shadow-[0_0_12px_rgba(0,255,136,0.3)]">
-              <div 
-                className="h-full bg-gradient-to-r from-neon-green to-neon-cyan duration-100 transition-all shadow-[0_0_12px_#00ff88]" 
+              <div
+                className="h-full bg-gradient-to-r from-neon-green to-neon-cyan duration-100 transition-all shadow-[0_0_12px_#00ff88]"
                 style={{ width: `${loadPercentage}%` }}
               />
             </div>
@@ -823,8 +1058,8 @@ export default function App() {
           </a>
 
           {/* Simple portable mobile control toggle */}
-          <div 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+          <div
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden flex flex-col gap-[5px] cursor-pointer"
           >
             <span className={`w-6 h-[2px] bg-[#00ff88] transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
@@ -835,8 +1070,8 @@ export default function App() {
           <ul className={`absolute md:static top-full left-0 right-0 md:flex items-center gap-7 bg-black/95 md:bg-transparent p-6 md:p-0 border-b md:border-0 border-emerald-500/10 ${mobileMenuOpen ? 'flex flex-col' : 'hidden'}`}>
             {['profile', 'skills', 'games', 'projects', 'youtube', 'contact'].map((sect) => (
               <li key={sect}>
-                <a 
-                  href={`#${sect}`} 
+                <a
+                  href={`#${sect}`}
                   onClick={() => setMobileMenuOpen(false)}
                   className="font-mono text-[11px] tracking-widest text-[#7affb8] hover:text-[#00ff88] duration-300 uppercase relative block py-2 md:py-0 group"
                 >
@@ -857,11 +1092,11 @@ export default function App() {
       {/* ----------------------------------------------------
           HERO LANDING WORKPLACE (Canvas Orbit lines and Matrix Streams)
          ---------------------------------------------------- */}
-      <section 
-        id="hero" 
+      <section
+        id="hero"
         className={`transition-all duration-[1200ms] ease-out flex items-center justify-center overflow-hidden ${
-          !enteredDomain 
-            ? "fixed inset-0 z-[95] w-screen h-screen bg-black pt-16" 
+          !enteredDomain
+            ? "fixed inset-0 z-[95] w-screen h-screen bg-black pt-16"
             : "absolute inset-x-0 top-0 h-screen opacity-0 pointer-events-none -translate-y-[35%] scale-95"
         }`}
       >
@@ -884,18 +1119,22 @@ export default function App() {
           </div>
 
           <div className="flex flex-wrap gap-4 justify-center">
-            <button 
-              onClick={handleEnterDomain}
-              className="px-8 py-3 text-xs font-main font-bold tracking-[0.15em] uppercase text-black bg-[#00ff88] btn-primary-clip border border-[#00ff88] hover:bg-transparent hover:text-[#00ff88] shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:shadow-[0_0_40px_rgba(0,255,136,0.6)] transition-all duration-300 cursor-pointer"
-            >
-              Enter Domain
-            </button>
-            <button 
-              onClick={handleWatchContent}
-              className="px-8 py-3 text-xs font-main font-bold tracking-[0.15em] uppercase text-[#00eeff] bg-transparent btn-primary-clip border border-[#00eeff] hover:bg-[#00eeff]/10 hover:shadow-[0_0_30px_rgba(0,238,255,0.4)] transition-all duration-300 cursor-pointer"
-            >
-              &#9654; Watch Content
-            </button>
+            <MagneticAnchor>
+              <button
+                onClick={handleEnterDomain}
+                className="px-8 py-3 text-xs font-main font-bold tracking-[0.15em] uppercase text-black bg-[#00ff88] btn-primary-clip border border-[#00ff88] hover:bg-transparent hover:text-[#00ff88] shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:shadow-[0_0_40px_rgba(0,255,136,0.6)] transition-all duration-300 cursor-pointer"
+              >
+                Enter Domain
+              </button>
+            </MagneticAnchor>
+            <MagneticAnchor>
+              <button
+                onClick={handleWatchContent}
+                className="px-8 py-3 text-xs font-main font-bold tracking-[0.15em] uppercase text-[#00eeff] bg-transparent btn-primary-clip border border-[#00eeff] hover:bg-[#00eeff]/10 hover:shadow-[0_0_30px_rgba(0,238,255,0.4)] transition-all duration-300 cursor-pointer"
+              >
+                &#9654; Watch Content
+              </button>
+            </MagneticAnchor>
           </div>
         </div>
 
@@ -904,7 +1143,7 @@ export default function App() {
           <div className="absolute inset-0 bg-black/75 z-50 flex flex-col items-center justify-center pointer-events-none">
             {/* Grid Calibration Lines */}
             <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,rgba(0,255,136,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,255,136,0.1)_1px,transparent_1px)] bg-[size:40px_40px]" />
-            
+
             {/* Rapid vertical laser sweeping line */}
             <div className="absolute left-0 right-0 h-[4px] bg-gradient-to-r from-transparent via-[#00ff88] to-transparent shadow-[0_0_20px_#00ff88] animate-scan-line-fast" />
 
@@ -915,13 +1154,13 @@ export default function App() {
               <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#00ff88]" />
               <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#00ff88]" />
               <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#00ff88]" />
-              
+
               <Terminal className="w-12 h-12 text-[#00eeff] mb-4 animate-pulse-dot" />
-              
+
               <div className="font-main text-lg font-black text-[#00ff88] tracking-widest uppercase mb-2">
                 MK SECURITY PORTAL
               </div>
-              
+
               <div className="font-mono text-[10px] text-[#00eeff]/80 uppercase tracking-[0.2em] mb-4">
                 AUTHENTICATING DOMAIN...
               </div>
@@ -956,12 +1195,12 @@ export default function App() {
       {/* ----------------------------------------------------
           PLAYER PROFILE WORKSPACE (Change Requirement 4 - Premium section headers)
          ---------------------------------------------------- */}
-      <section id="profile" className="scroll-reveal py-24 px-6 md:px-12 bg-gradient-to-b from-black to-[#020f08]">
+      <motion.section variants={fadeUp} transition={{ duration: 0.7 }} id="profile" className="scroll-reveal py-24 px-6 md:px-12 bg-gradient-to-b from-black to-[#020f08]">
         <div className="max-w-6xl mx-auto">
-          {/* 
+          {/*
             PREMIUM SECTION HEADER - (Change Requirement 4)
             - Removed Visual Label prefix: "// PLAYER PROFILE"
-            - Upgraded with custom uppercase typography, letters matching Orbitron, and neon vector underlines. 
+            - Upgraded with custom uppercase typography, letters matching Orbitron, and neon vector underlines.
           */}
           <div className="text-center mb-16">
             <span className="font-main text-[11px] tracking-[0.4em] text-[#00eeff] block mb-2 uppercase glow-cyan"
@@ -980,15 +1219,15 @@ export default function App() {
                 <div className="absolute inset-[-10px] border border-[#00ff88]/20 rounded-full animate-ring-rotate" />
                 <div className="absolute inset-[-20px] border border-[#00eeff]/15 rounded-full animate-ring-rotate-reverse" />
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00ff88] to-transparent animate-scan-line" />
-                
+
                 {/* Orbit tracker dots */}
                 <span className="absolute w-[6px] h-[6px] bg-[#00ff88] rounded-full shadow-[0_0_8px_#00ff88] animate-orbit-dot-1" />
                 <span className="absolute w-[6px] h-[6px] bg-[#00eeff] rounded-full shadow-[0_0_8px_#00eeff] animate-orbit-dot-2" />
 
                 <div className="w-full h-full bg-[#031109] border-2 border-[rgba(0,255,136,0.25)] flex items-center justify-center overflow-hidden group/profile-img relative">
-                  <img 
-                    src="/images/profile.jpg" 
-                    alt="NoobMKGamer Profile Avatar" 
+                  <img
+                    src="/images/profile.jpg"
+                    alt="NoobMKGamer Profile Avatar"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover/profile-img:scale-110"
                   />
@@ -1033,7 +1272,7 @@ export default function App() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       <div className="w-full h-[1px] relative bg-gradient-to-r from-transparent via-[#00eeff]/30 to-transparent" />
 
@@ -1072,7 +1311,7 @@ export default function App() {
          ---------------------------------------------------- */}
       <section id="games" className="scroll-reveal py-24 px-6 md:px-12 bg-gradient-to-b from-black via-[#010c05] to-black">
         <div className="max-w-6xl mx-auto">
-          {/* 
+          {/*
             PREMIUM SECTION HEADER - (Change Requirement 4)
             - Removed Visual Label prefix: "// GAME LIBRARY"
             - Upgraded with gothic tracking block and neon glowing elements.
@@ -1088,52 +1327,52 @@ export default function App() {
 
           {/* Cards Layout grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <GameCard 
-              title="Free Fire" 
-              badge="ACTIVE" 
-              accentColor="green" 
-              icon={Flame} 
-              desc="Battle royale survival on the edge. Precision drops, clutch plays, and Booyah moments that define a champion." 
+            <GameCard
+              title="Free Fire"
+              badge="ACTIVE"
+              accentColor="green"
+              icon={Flame}
+              desc="Battle royale survival on the edge. Precision drops, clutch plays, and Booyah moments that define a champion."
               image="/images/freefire.jpg"
             />
-            <GameCard 
-              title="PUBG Mobile" 
-              badge="RANKED" 
-              accentColor="cyan" 
-              icon={Target} 
-              desc="The original battleground. 100 players, one winner. Strategy, patience, and perfect timing are the weapons of choice." 
+            <GameCard
+              title="PUBG Mobile"
+              badge="RANKED"
+              accentColor="cyan"
+              icon={Target}
+              desc="The original battleground. 100 players, one winner. Strategy, patience, and perfect timing are the weapons of choice."
               image="/images/pubg.jpg"
             />
-            <GameCard 
-              title="Clash of Clans" 
-              badge="MAXED" 
-              accentColor="green" 
-              icon={Swords} 
-              desc="Build, destroy, and conquer. Managing clans and raids at the highest level — war is an art form." 
+            <GameCard
+              title="Clash of Clans"
+              badge="MAXED"
+              accentColor="green"
+              icon={Swords}
+              desc="Build, destroy, and conquer. Managing clans and raids at the highest level — war is an art form."
               image="/images/coc.jpg"
             />
-            <GameCard 
-              title="GTA" 
-              badge="LEGEND" 
-              accentColor="purple" 
-              icon={Car} 
-              desc="Open-world chaos mastered. From heists to street racing — no mission is impossible in the digital city." 
+            <GameCard
+              title="GTA"
+              badge="LEGEND"
+              accentColor="purple"
+              icon={Car}
+              desc="Open-world chaos mastered. From heists to street racing — no mission is impossible in the digital city."
               image="/images/gta.jpg"
             />
-            <GameCard 
-              title="Minecraft" 
-              badge="BUILDER" 
-              accentColor="cyan" 
-              icon={Box} 
-              desc="From dirt huts to digital empires. Survival mode veteran with builds that defy the laws of pixels." 
+            <GameCard
+              title="Minecraft"
+              badge="BUILDER"
+              accentColor="cyan"
+              icon={Box}
+              desc="From dirt huts to digital empires. Survival mode veteran with builds that defy the laws of pixels."
               image="/images/minecraft.jpg"
             />
-            <GameCard 
-              title="Mobile Legends" 
-              badge="ELITE" 
-              accentColor="purple" 
-              icon={Shield} 
-              desc="MOBA mastery at its peak. Every lane, every hero, every team fight — calculated, dominant, and unstoppable." 
+            <GameCard
+              title="Mobile Legends"
+              badge="ELITE"
+              accentColor="purple"
+              icon={Shield}
+              desc="MOBA mastery at its peak. Every lane, every hero, every team fight — calculated, dominant, and unstoppable."
               image="/images/mlbb.jpg"
             />
           </div>
@@ -1158,24 +1397,24 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <ProjectCard 
-              num="PROJECT_001" 
-              title="BattleTracker Pro" 
-              desc="Real-time battle statistics tracker across multiple games. Monitor K/D ratios, win rates, and performance trends with precision analytics." 
+            <ProjectCard
+              num="PROJECT_001"
+              title="BattleTracker Pro"
+              desc="Real-time battle statistics tracker across multiple games. Monitor K/D ratios, win rates, and performance trends with precision analytics."
               iconName="📊"
               image="/images/project1.jpg"
             />
-            <ProjectCard 
-              num="PROJECT_002" 
-              title="Clan Management Hub" 
-              desc="All-in-one dashboard for managing clan operations — member tracking, raid scheduling, war logs, and coordination tools." 
+            <ProjectCard
+              num="PROJECT_002"
+              title="Clan Management Hub"
+              desc="All-in-one dashboard for managing clan operations — member tracking, raid scheduling, war logs, and coordination tools."
               iconName="👥"
               image="/images/project2.jpg"
             />
-            <ProjectCard 
-              num="PROJECT_003" 
-              title="Loot Analyzer" 
-              desc="AI-powered loot optimization tool that calculates best item combinations, rarity probabilities, and optimal drop zone strategies." 
+            <ProjectCard
+              num="PROJECT_003"
+              title="Loot Analyzer"
+              desc="AI-powered loot optimization tool that calculates best item combinations, rarity probabilities, and optimal drop zone strategies."
               iconName="🎁"
               image="/images/project3.jpg"
             />
@@ -1203,7 +1442,7 @@ export default function App() {
           <div className="bg-gradient-to-br from-emerald-950/15 to-black border border-[rgba(0,255,136,0.25)] p-12 relative overflow-hidden group">
             {/* Cyber background patterns */}
             <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_50%,rgba(0,255,136,0.01)_50%)] bg-[size:40px_100%] pointer-events-none" />
-            
+
             <div className="relative z-10">
               <div className="font-main text-sm text-[rgba(0,255,136,0.4)] tracking-widest mb-6">
                 [ OFFICIAL GAMING STREAM ARCHIVE ]
@@ -1213,10 +1452,10 @@ export default function App() {
               </p>
 
               <div>
-                <a 
-                  href="https://youtube.com/@NoobMKGamer" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href="https://youtube.com/@NoobMKGamer"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-3 px-8 py-4 font-main font-bold text-xs tracking-widest text-white bg-[#ff0000] hover:bg-[#d60000] btn-yt-clip duration-300 shadow-[0_0_20px_rgba(255,0,0,0.4)] hover:shadow-[0_0_40px_rgba(255,0,0,0.7)]"
                 >
                   <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
@@ -1237,7 +1476,7 @@ export default function App() {
          ---------------------------------------------------- */}
       <section id="contact" className="scroll-reveal py-24 px-6 md:px-12 bg-black">
         <div className="max-w-2xl mx-auto">
-          {/* 
+          {/*
             PREMIUM SECTION HEADER - (Change Requirement 4)
             - Removed Visual Label prefix: "// CONTACT"
             - Refactored using typography and purple glow effects.
@@ -1264,11 +1503,11 @@ export default function App() {
                 <label className="block font-mono text-[10px] text-[#00eeff] tracking-widest uppercase mb-2">
                   Identification
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter your alias..." 
+                  placeholder="Enter your alias..."
                   required
                   className="w-full bg-emerald-950/5 border border-emerald-500/20 text-[#e0ffe8] font-mono text-xs p-4 outline-none transition-all duration-300 focus:border-[#00ff88] focus:shadow-[0_0_20px_rgba(0,255,136,0.15)]"
                 />
@@ -1278,11 +1517,11 @@ export default function App() {
                 <label className="block font-mono text-[10px] text-[#00eeff] tracking-widest uppercase mb-2">
                   Signal Frequency (Email)
                 </label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="your@signal.com" 
+                  placeholder="your@signal.com"
                   required
                   className="w-full bg-emerald-950/5 border border-emerald-500/20 text-[#e0ffe8] font-mono text-xs p-4 outline-none transition-all duration-300 focus:border-[#00ff88] focus:shadow-[0_0_20px_rgba(0,255,136,0.15)]"
                 />
@@ -1292,23 +1531,25 @@ export default function App() {
                 <label className="block font-mono text-[10px] text-[#00eeff] tracking-widest uppercase mb-2">
                   Transmission
                 </label>
-                <textarea 
-                  rows={5} 
+                <textarea
+                  rows={5}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Encode your message here..." 
+                  placeholder="Encode your message here..."
                   required
                   className="w-full bg-emerald-950/5 border border-emerald-500/20 text-[#e0ffe8] font-mono text-xs p-4 outline-none transition-all duration-300 focus:border-[#00ff88] focus:shadow-[0_0_20px_rgba(0,255,136,0.15)] resize-none"
                 />
               </div>
 
-              <button 
-                type="submit" 
-                disabled={formTransmitting}
-                className="w-full py-4 text-xs font-main font-bold tracking-[0.2em] uppercase bg-transparent text-[#bf5fff] hover:text-black hover:bg-[#bf5fff] hover:shadow-[0_0_30px_rgba(191,95,255,0.4)] border border-[#bf5fff] duration-300 btn-yt-clip disabled:opacity-50"
-              >
-                {formTransmitting ? 'TRANSMITTING...' : 'TRANSMIT MESSAGE'}
-              </button>
+              <MagneticAnchor className="w-full">
+                <button
+                  type="submit"
+                  disabled={formTransmitting}
+                  className="w-full py-4 text-xs font-main font-bold tracking-[0.2em] uppercase bg-transparent text-[#bf5fff] hover:text-black hover:bg-[#bf5fff] hover:shadow-[0_0_30px_rgba(191,95,255,0.4)] border border-[#bf5fff] duration-300 btn-yt-clip disabled:opacity-50"
+                >
+                  {formTransmitting ? 'TRANSMITTING...' : 'TRANSMIT MESSAGE'}
+                </button>
+              </MagneticAnchor>
 
               {formSubmitted && (
                 <div className="p-4 border border-[#00ff88] bg-[#00ff88]/5 text-center font-mono text-xs text-[#00ff88] animate-pulse">
@@ -1331,16 +1572,16 @@ export default function App() {
          ---------------------------------------------------- */}
       <footer className="border-t border-[rgba(0,255,136,0.2)] py-12 px-6 text-center relative bg-black">
         <div className="absolute top-[-1px] left-1/2 transform -translate-x-1/2 w-48 h-[1px] bg-gradient-to-r from-transparent via-[#00ff88] to-transparent shadow-[0_0_20px_#00ff88]" />
-        
+
         <div className="font-main text-lg font-black text-[#00ff88] tracking-widest mb-6 glow-green glitch" data-text="NOOBMKGAMER">
           NOOBMKGAMER
         </div>
 
         <nav className="flex flex-wrap justify-center gap-6 mb-8">
           {['profile', 'skills', 'games', 'projects', 'youtube', 'contact'].map((sect) => (
-            <a 
-              key={sect} 
-              href={`#${sect}`} 
+            <a
+              key={sect}
+              href={`#${sect}`}
               className="font-mono text-[10px] text-emerald-500/55 hover:text-[#00ff88] tracking-widest duration-200 uppercase"
             >
               {sect}
@@ -1350,9 +1591,9 @@ export default function App() {
 
         <div className="flex justify-center gap-4 mb-8">
           {['youtube', 'instagram', 'twitter', 'discord'].map((social) => (
-            <a 
-              key={social} 
-              href="#" 
+            <a
+              key={social}
+              href="#"
               onClick={(e) => e.preventDefault()}
               className="w-10 h-10 border border-emerald-500/30 hover:border-[#00ff88] text-emerald-500/55 hover:text-[#00ff88] hover:shadow-[0_0_15px_rgba(0,255,136,0.3)] transition-all duration-300 flex items-center justify-center text-xs"
             >
@@ -1368,6 +1609,6 @@ export default function App() {
         </div>
       </footer>
 
-    </div>
+    </motion.div>
   );
 }
