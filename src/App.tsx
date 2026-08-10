@@ -164,13 +164,11 @@ const PremiumThreeBackdrop: React.FC<{ reducedMotion?: boolean; isPageVisible?: 
         renderer.domElement.className = 'premium-three-canvas';
         mount.appendChild(renderer.domElement);
 
-        // Subtle depth fog for premium depth.
         scene.fog = new THREE.FogExp2(0x050714, isMobile ? 0.04 : 0.028);
 
         const group = new THREE.Group();
         scene.add(group);
 
-        // Art-directed premium glass forms (deterministic, 2–4 forms)
         const heroGeo = new THREE.TorusKnotGeometry(0.9, 0.22, 220, 16);
         const orbGeo = new THREE.IcosahedronGeometry(0.72, 3);
         const shardGeo = new THREE.OctahedronGeometry(0.62, 1);
@@ -214,9 +212,8 @@ const PremiumThreeBackdrop: React.FC<{ reducedMotion?: boolean; isPageVisible?: 
         satellite.scale.setScalar(0.88);
         group.add(satellite);
 
-        // Particles: subtle, reduced for premium restraint.
         const particleGeometry = new THREE.BufferGeometry();
-        const count = reducedMotion ? 0 : isMobile ? 180 : 420;
+        const count = reducedMotion ? 0 : isMobile ? 160 : 360;
         if (count > 0) {
           const positions = new Float32Array(count * 3);
           for (let i = 0; i < count * 3; i += 3) {
@@ -227,29 +224,27 @@ const PremiumThreeBackdrop: React.FC<{ reducedMotion?: boolean; isPageVisible?: 
           particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
           const particles = new THREE.Points(
             particleGeometry,
-            new THREE.PointsMaterial({ color: '#eaf7ff', size: isMobile ? 0.016 : 0.018, transparent: true, opacity: 0.42, depthWrite: false })
+            new THREE.PointsMaterial({ color: '#eaf7ff', size: isMobile ? 0.016 : 0.018, transparent: true, opacity: 0.38, depthWrite: false })
           );
           scene.add(particles);
         }
 
-        // Intentional lighting rig: key / rim / fill.
-        scene.add(new THREE.AmbientLight('#eaf7ff', 0.85));
+        scene.add(new THREE.AmbientLight('#eaf7ff', 0.9));
 
-        const key = new THREE.DirectionalLight('#dff3ff', 1.65);
+        const key = new THREE.DirectionalLight('#dff3ff', 1.55);
         key.position.set(3.2, 2.4, 3.6);
         scene.add(key);
 
-        const rim = new THREE.DirectionalLight('#22d3ee', 1.05);
+        const rim = new THREE.DirectionalLight('#22d3ee', 1.0);
         rim.position.set(-4.2, 1.1, -2.4);
         scene.add(rim);
 
-        const fill = new THREE.PointLight('#ff72d2', isMobile ? 6.5 : 8.5, 28);
+        const fill = new THREE.PointLight('#ff72d2', isMobile ? 6.0 : 8.0, 28);
         fill.position.set(-1.1, -1.2, 3.2);
         scene.add(fill);
 
         const clock = new THREE.Clock();
 
-        // Camera parallax (desktop only)
         const parallax = { x: 0, y: 0, tx: 0, ty: 0 };
         const onMove = (ev: PointerEvent) => {
           if (!isFinePointer || isMobile || reducedMotion) return;
@@ -278,7 +273,6 @@ const PremiumThreeBackdrop: React.FC<{ reducedMotion?: boolean; isPageVisible?: 
 
           const t = clock.getElapsedTime();
 
-          // Smooth parallax
           if (!isMobile && !reducedMotion && isFinePointer) {
             parallax.x += (parallax.tx - parallax.x) * 0.06;
             parallax.y += (parallax.ty - parallax.y) * 0.06;
@@ -286,7 +280,6 @@ const PremiumThreeBackdrop: React.FC<{ reducedMotion?: boolean; isPageVisible?: 
             camera.position.y = -parallax.y * 0.22;
           }
 
-          // Premium, slow motion (no frantic rotation)
           const spin = reducedMotion ? 0 : 0.14;
           group.rotation.y = t * spin;
           group.rotation.x = t * (spin * 0.32);
@@ -318,9 +311,7 @@ const PremiumThreeBackdrop: React.FC<{ reducedMotion?: boolean; isPageVisible?: 
         };
       } catch {
         mount.classList.add('premium-three-fallback');
-        return () => {
-          // nothing
-        };
+        return () => {};
       }
     };
 
@@ -339,9 +330,6 @@ const PremiumThreeBackdrop: React.FC<{ reducedMotion?: boolean; isPageVisible?: 
   return <div ref={mountRef} className="premium-three-backdrop" aria-hidden="true" />;
 };
 
-// ----------------------------------------------------
-// Custom Projected Canvas Background Component (kept, but performance-gated)
-// ----------------------------------------------------
 const CyberParticleSpace: React.FC<{ reducedMotion?: boolean; isPageVisible?: boolean; isMobile?: boolean; }> = ({ reducedMotion = false, isPageVisible = true, isMobile = false }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
@@ -372,13 +360,13 @@ const CyberParticleSpace: React.FC<{ reducedMotion?: boolean; isPageVisible?: bo
     });
     if (canvas.parentElement) resizeObserver.observe(canvas.parentElement);
 
-    const particleCount = isMobile ? 80 : 190;
+    const particleCount = isMobile ? 70 : 170;
     const particles = Array.from({ length: particleCount }, () => ({
       x: (Math.random() - 0.5) * 380,
       y: (Math.random() - 0.5) * 380,
       z: Math.random() * 420,
       size: Math.random() * 1.2 + 0.4,
-      color: Math.random() > 0.45 ? 'rgba(96, 165, 250, 0.35)' : 'rgba(34, 211, 238, 0.32)'
+      color: Math.random() > 0.5 ? 'rgba(96, 165, 250, 0.35)' : 'rgba(255, 114, 210, 0.28)'
     }));
 
     let rotationAngle = 0;
@@ -390,7 +378,6 @@ const CyberParticleSpace: React.FC<{ reducedMotion?: boolean; isPageVisible?: bo
         return;
       }
 
-      // throttle on mobile (every other frame)
       tick++;
       if (isMobile && tick % 2 === 0) {
         animationFrameId = requestAnimationFrame(render);
@@ -451,9 +438,6 @@ const CyberParticleSpace: React.FC<{ reducedMotion?: boolean; isPageVisible?: bo
   return <canvas ref={canvasRef} className="absolute inset-0 block pointer-events-none z-1" />;
 };
 
-// ----------------------------------------------------
-// High-tech matrix terminal background streams (kept, but visibility/reduced-motion gated)
-// ----------------------------------------------------
 interface MatrixRainProps {
   alpha?: string;
   canvasId: string;
@@ -489,7 +473,7 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
     let cols = Math.floor(width / fs);
     let drops = Array(cols).fill(1);
 
-    const intervalMs = isMobile ? 85 : 55;
+    const intervalMs = isMobile ? 95 : 65;
 
     const interval = window.setInterval(() => {
       if (!isPageVisible) return;
@@ -497,7 +481,7 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
       ctx.fillStyle = alpha;
       ctx.fillRect(0, 0, width, height);
 
-      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.fillStyle = 'rgba(255,255,255,0.42)';
       ctx.font = `${fs}px "Orbitron"`;
 
       cols = Math.floor(width / fs);
@@ -506,7 +490,7 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
       drops.forEach((d, i) => {
         const text = chars[Math.floor(Math.random() * chars.length)];
         ctx.fillText(text, i * fs, d * fs);
-        if (d * fs > height && Math.random() > 0.98) drops[i] = 0;
+        if (d * fs > height && Math.random() > 0.985) drops[i] = 0;
         drops[i]++;
       });
     }, intervalMs);
@@ -520,9 +504,6 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
   return <canvas ref={canvasRef} id={canvasId} className="absolute inset-0 opacity-55 block pointer-events-none" />;
 };
 
-// ----------------------------------------------------
-// Individual Premium Game Card (kept, but styling shifted by CSS)
-// ----------------------------------------------------
 const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: IconComponent, desc, image }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -575,6 +556,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
         />
         <div className="absolute inset-0 premium-media-scrim" />
 
+      
         <div
           className={`relative z-10 p-3 rounded-full transition-all duration-700 ease-out flex items-center justify-center premium-icon-disc ${isHovered ? 'scale-110 rotate-6' : 'scale-100'}`}
           style={{
@@ -612,9 +594,6 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
   );
 };
 
-// ----------------------------------------------------
-// Core Skills Matrix List elements (kept, but styling shifted by CSS)
-// ----------------------------------------------------
 const SkillCard: React.FC<SkillCardProps> = ({ name, icon, level, accent }) => {
   const [percent, setPercent] = useState(0);
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -676,9 +655,6 @@ const SkillCard: React.FC<SkillCardProps> = ({ name, icon, level, accent }) => {
   );
 };
 
-// ----------------------------------------------------
-// Digital Project elements mapped (kept, styling shifted by CSS)
-// ----------------------------------------------------
 const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName, image }) => {
   return (
     <div className="relative group p-6 transition-all duration-300 premium-surface-card">
@@ -708,9 +684,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName, i
   );
 };
 
-// ----------------------------------------------------
-// Main Dashboard Application Component Entry
-// ----------------------------------------------------
 export default function App() {
   const { reducedMotion, isPageVisible, isMobile, isFinePointer } = useMotionEnvironment();
 
@@ -727,14 +700,12 @@ export default function App() {
 
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
-  // Refs for cursor + spotlight without React state updates
   const appRootRef = useRef<HTMLDivElement | null>(null);
   const cursorElRef = useRef<HTMLDivElement | null>(null);
   const cursorRingElRef = useRef<HTMLDivElement | null>(null);
   const pointerRef = useRef({ x: 0, y: 0 });
   const ringRef = useRef({ x: 0, y: 0 });
 
-  // Sync scroll lock with enteredDomain state
   useEffect(() => {
     if (!enteredDomain) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
@@ -776,7 +747,6 @@ export default function App() {
     }, 1800);
   };
 
-  // GSAP: only run when visible + motion allowed
   useEffect(() => {
     if (reducedMotion || !isPageVisible) return;
 
@@ -800,7 +770,6 @@ export default function App() {
     };
   }, [reducedMotion, isPageVisible]);
 
-  // Cursor + spotlight: refs + RAF writes (desktop only)
   useEffect(() => {
     if (!enteredDomain) return;
     if (reducedMotion) return;
@@ -819,12 +788,8 @@ export default function App() {
       r.x += (p.x - r.x) * 0.16;
       r.y += (p.y - r.y) * 0.16;
 
-      if (cursorElRef.current) {
-        cursorElRef.current.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
-      }
-      if (cursorRingElRef.current) {
-        cursorRingElRef.current.style.transform = `translate3d(${r.x}px, ${r.y}px, 0)`;
-      }
+      if (cursorElRef.current) cursorElRef.current.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
+      if (cursorRingElRef.current) cursorRingElRef.current.style.transform = `translate3d(${r.x}px, ${r.y}px, 0)`;
       if (appRootRef.current) {
         appRootRef.current.style.setProperty('--spotlight-x', `${p.x}px`);
         appRootRef.current.style.setProperty('--spotlight-y', `${p.y}px`);
@@ -832,6 +797,7 @@ export default function App() {
 
       raf = requestAnimationFrame(tick);
     };
+
     raf = requestAnimationFrame(tick);
 
     return () => {
@@ -840,7 +806,6 @@ export default function App() {
     };
   }, [enteredDomain, reducedMotion, isMobile, isFinePointer]);
 
-  // Tilt effect: gated + RAF-throttled (desktop only)
   useEffect(() => {
     if (!enteredDomain) return;
     if (reducedMotion) return;
@@ -898,7 +863,6 @@ export default function App() {
 
   useEffect(() => {
     const progressTimer = window.setInterval(() => {
-      // pause progress updates when hidden to avoid useless work
       if (!isPageVisible) return;
 
       setLoadPercentage((prev) => {
@@ -961,7 +925,7 @@ export default function App() {
       animate="visible"
       variants={fadeUp}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="premium-app-shell relative min-h-screen text-white overflow-hidden selection:bg-white/20 selection:text-white font-body"
+      className={`premium-app-shell relative min-h-screen text-white overflow-hidden selection:bg-white/20 selection:text-white font-body ${enteredDomain ? 'entered-domain' : ''}`}
     >
       <PremiumThreeBackdrop reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} isFinePointer={isFinePointer} />
       <div className="premium-aurora-field" aria-hidden="true" />
@@ -971,16 +935,8 @@ export default function App() {
 
       <div className="scanline-overlay pointer-events-none" />
 
-      <div
-        id="cursor"
-        ref={cursorElRef}
-        className="hidden md:block"
-      />
-      <div
-        id="cursor-ring"
-        ref={cursorRingElRef}
-        className="hidden md:block"
-      />
+      <div id="cursor" ref={cursorElRef} className="hidden md:block" />
+      <div id="cursor-ring" ref={cursorRingElRef} className="hidden md:block" />
 
       {isLoading && (
         <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 premium-boot-screen">
@@ -1000,10 +956,7 @@ export default function App() {
             </div>
 
             <div className="w-full h-[4px] rounded-full overflow-hidden premium-progress-track">
-              <div
-                className="h-full premium-progress-fill"
-                style={{ width: `${loadPercentage}%` }}
-              />
+              <div className="h-full premium-progress-fill" style={{ width: `${loadPercentage}%` }} />
             </div>
             <div className="text-right text-[10px] mt-3 text-white/50 tracking-wide">
               CORE LINK: {loadPercentage}%
@@ -1062,7 +1015,7 @@ export default function App() {
         className={`transition-all duration-[1200ms] ease-out flex items-center justify-center overflow-hidden ${
           !enteredDomain
             ? "fixed inset-0 z-[95] w-screen h-screen pt-16"
-            : "absolute inset-x-0 top-0 h-screen opacity-0 pointer-events-none -translate-y-[35%] scale-95"
+            : "hidden"
         }`}
       >
         <MatrixRainStream canvasId="hero-matrix-canvas" reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} />
@@ -1138,9 +1091,9 @@ export default function App() {
         )}
       </section>
 
-      <div className="w-full h-[1px] relative bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="premium-divider" />
 
-      <motion.section variants={fadeUp} transition={{ duration: 0.7 }} id="profile" className="scroll-reveal py-24 px-6 md:px-12">
+      <motion.section variants={fadeUp} transition={{ duration: 0.7 }} id="profile" className="scroll-reveal py-24 px-6 md:px-12 premium-first-section">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-main font-black text-2xl md:text-4xl text-white tracking-wide uppercase premium-section-title">
@@ -1194,7 +1147,7 @@ export default function App() {
         </div>
       </motion.section>
 
-      <div className="w-full h-[1px] relative bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="premium-divider" />
 
       <section id="skills" className="scroll-reveal py-24 px-6 md:px-12">
         <div className="max-w-6xl mx-auto">
@@ -1218,7 +1171,7 @@ export default function App() {
         </div>
       </section>
 
-      <div className="w-full h-[1px] relative bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="premium-divider" />
 
       <section id="games" className="scroll-reveal py-24 px-6 md:px-12">
         <div className="max-w-6xl mx-auto">
@@ -1230,59 +1183,17 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <GameCard
-              title="Free Fire"
-              badge="ACTIVE"
-              accentColor="green"
-              icon={Flame}
-              desc="Battle royale survival on the edge. Precision drops, clutch plays, and Booyah moments that define a champion."
-              image="/images/freefire.jpg"
-            />
-            <GameCard
-              title="PUBG Mobile"
-              badge="RANKED"
-              accentColor="cyan"
-              icon={Target}
-              desc="The original battleground. 100 players, one winner. Strategy, patience, and perfect timing are the weapons of choice."
-              image="/images/pubg.jpg"
-            />
-            <GameCard
-              title="Clash of Clans"
-              badge="MAXED"
-              accentColor="green"
-              icon={Swords}
-              desc="Build, destroy, and conquer. Managing clans and raids at the highest level — war is an art form."
-              image="/images/coc.jpg"
-            />
-            <GameCard
-              title="GTA"
-              badge="LEGEND"
-              accentColor="purple"
-              icon={Car}
-              desc="Open-world chaos mastered. From heists to street racing — no mission is impossible in the digital city."
-              image="/images/gta.jpg"
-            />
-            <GameCard
-              title="Minecraft"
-              badge="BUILDER"
-              accentColor="cyan"
-              icon={Box}
-              desc="From dirt huts to digital empires. Survival mode veteran with builds that defy the laws of pixels."
-              image="/images/minecraft.jpg"
-            />
-            <GameCard
-              title="Mobile Legends"
-              badge="ELITE"
-              accentColor="purple"
-              icon={Shield}
-              desc="MOBA mastery at its peak. Every lane, every hero, every team fight — calculated, dominant, and unstoppable."
-              image="/images/mlbb.jpg"
-            />
+            <GameCard title="Free Fire" badge="ACTIVE" accentColor="green" icon={Flame} desc="Battle royale survival on the edge. Precision drops, clutch plays, and Booyah moments that define a champion." image="/images/freefire.jpg" />
+            <GameCard title="PUBG Mobile" badge="RANKED" accentColor="cyan" icon={Target} desc="The original battleground. 100 players, one winner. Strategy, patience, and perfect timing are the weapons of choice." image="/images/pubg.jpg" />
+            <GameCard title="Clash of Clans" badge="MAXED" accentColor="green" icon={Swords} desc="Build, destroy, and conquer. Managing clans and raids at the highest level — war is an art form." image="/images/coc.jpg" />
+            <GameCard title="GTA" badge="LEGEND" accentColor="purple" icon={Car} desc="Open-world chaos mastered. From heists to street racing — no mission is impossible in the digital city." image="/images/gta.jpg" />
+            <GameCard title="Minecraft" badge="BUILDER" accentColor="cyan" icon={Box} desc="From dirt huts to digital empires. Survival mode veteran with builds that defy the laws of pixels." image="/images/minecraft.jpg" />
+            <GameCard title="Mobile Legends" badge="ELITE" accentColor="purple" icon={Shield} desc="MOBA mastery at its peak. Every lane, every hero, every team fight — calculated, dominant, and unstoppable." image="/images/mlbb.jpg" />
           </div>
         </div>
       </section>
 
-      <div className="w-full h-[1px] relative bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="premium-divider" />
 
       <section id="projects" className="scroll-reveal py-24 px-6 md:px-12">
         <div className="max-w-6xl mx-auto">
@@ -1294,32 +1205,14 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <ProjectCard
-              num="PROJECT_001"
-              title="BattleTracker Pro"
-              desc="Real-time battle statistics tracker across multiple games. Monitor K/D ratios, win rates, and performance trends with precision analytics."
-              iconName="📊"
-              image="/images/project1.jpg"
-            />
-            <ProjectCard
-              num="PROJECT_002"
-              title="Clan Management Hub"
-              desc="All-in-one dashboard for managing clan operations — member tracking, raid scheduling, war logs, and coordination tools."
-              iconName="👥"
-              image="/images/project2.jpg"
-            />
-            <ProjectCard
-              num="PROJECT_003"
-              title="Loot Analyzer"
-              desc="AI-powered loot optimization tool that calculates best item combinations, rarity probabilities, and optimal drop zone strategies."
-              iconName="🎁"
-              image="/images/project3.jpg"
-            />
+            <ProjectCard num="PROJECT_001" title="BattleTracker Pro" desc="Real-time battle statistics tracker across multiple games. Monitor K/D ratios, win rates, and performance trends with precision analytics." iconName="📊" image="/images/project1.jpg" />
+            <ProjectCard num="PROJECT_002" title="Clan Management Hub" desc="All-in-one dashboard for managing clan operations — member tracking, raid scheduling, war logs, and coordination tools." iconName="👥" image="/images/project2.jpg" />
+            <ProjectCard num="PROJECT_003" title="Loot Analyzer" desc="AI-powered loot optimization tool that calculates best item combinations, rarity probabilities, and optimal drop zone strategies." iconName="🎁" image="/images/project3.jpg" />
           </div>
         </div>
       </section>
 
-      <div className="w-full h-[1px] relative bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="premium-divider" />
 
       <section id="youtube" className="scroll-reveal py-24 px-6 md:px-12">
         <div className="max-w-4xl mx-auto text-center">
@@ -1340,12 +1233,7 @@ export default function App() {
               </p>
 
               <div>
-                <a
-                  href="https://youtube.com/@NoobMKGamer"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-8 py-4 font-main font-bold text-xs tracking-widest text-white premium-btn premium-btn-youtube"
-                >
+                <a href="https://youtube.com/@NoobMKGamer" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-8 py-4 font-main font-bold text-xs tracking-widest text-white premium-btn premium-btn-youtube">
                   <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                   </svg>
@@ -1357,7 +1245,7 @@ export default function App() {
         </div>
       </section>
 
-      <div className="w-full h-[1px] relative bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="premium-divider" />
 
       <section id="contact" className="scroll-reveal py-24 px-6 md:px-12">
         <div className="max-w-2xl mx-auto">
@@ -1371,53 +1259,20 @@ export default function App() {
           <div className="relative p-8 md:p-12 premium-surface-panel">
             <form onSubmit={handleSubmitContactForm} className="space-y-6">
               <div>
-                <label className="block text-[10px] text-white/65 tracking-widest uppercase mb-2">
-                  Identification
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter your alias..."
-                  required
-                  className="w-full premium-input"
-                />
+                <label className="block text-[10px] text-white/65 tracking-widest uppercase mb-2">Identification</label>
+                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Enter your alias..." required className="w-full premium-input" />
               </div>
-
               <div>
-                <label className="block text-[10px] text-white/65 tracking-widest uppercase mb-2">
-                  Signal Frequency (Email)
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="your@signal.com"
-                  required
-                  className="w-full premium-input"
-                />
+                <label className="block text-[10px] text-white/65 tracking-widest uppercase mb-2">Signal Frequency (Email)</label>
+                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="your@signal.com" required className="w-full premium-input" />
               </div>
-
               <div>
-                <label className="block text-[10px] text-white/65 tracking-widest uppercase mb-2">
-                  Transmission
-                </label>
-                <textarea
-                  rows={5}
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Encode your message here..."
-                  required
-                  className="w-full premium-input resize-none"
-                />
+                <label className="block text-[10px] text-white/65 tracking-widest uppercase mb-2">Transmission</label>
+                <textarea rows={5} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Encode your message here..." required className="w-full premium-input resize-none" />
               </div>
 
               <MagneticAnchor className="w-full">
-                <button
-                  type="submit"
-                  disabled={formTransmitting}
-                  className="w-full py-4 text-xs font-main font-bold tracking-[0.2em] uppercase text-white premium-btn premium-btn-secondary disabled:opacity-50"
-                >
+                <button type="submit" disabled={formTransmitting} className="w-full py-4 text-xs font-main font-bold tracking-[0.2em] uppercase text-white premium-btn premium-btn-secondary disabled:opacity-50">
                   {formTransmitting ? 'TRANSMITTING...' : 'TRANSMIT MESSAGE'}
                 </button>
               </MagneticAnchor>
@@ -1439,17 +1294,11 @@ export default function App() {
       </section>
 
       <footer className="py-12 px-6 text-center relative">
-        <div className="font-main text-lg font-black text-white tracking-widest mb-6 premium-footer-title">
-          NOOBMKGAMER
-        </div>
+        <div className="font-main text-lg font-black text-white tracking-widest mb-6 premium-footer-title">NOOBMKGAMER</div>
 
         <nav className="flex flex-wrap justify-center gap-6 mb-8">
           {navSections.map((sect) => (
-            <a
-              key={sect}
-              href={`#${sect}`}
-              className="text-[10px] text-white/55 hover:text-white tracking-widest duration-200 uppercase"
-            >
+            <a key={sect} href={`#${sect}`} className="text-[10px] text-white/55 hover:text-white tracking-widest duration-200 uppercase">
               {sect}
             </a>
           ))}
