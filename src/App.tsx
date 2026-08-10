@@ -468,7 +468,11 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
     });
     if (canvas.parentElement) resizeObserver.observe(canvas.parentElement);
 
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>{}[]|/\\';
+    // Mixed CJK glyphs (Chinese Han, Japanese Hiragana/Katakana, Korean Hangul) + a few symbols.
+    const chars = '天地玄黄宇宙洪荒日月盈昃辰宿列張寒來暑往秋收冬藏金木水火土山川風林海光影夢幻未来世界電脳\nあいうえおかきくけこさしすせそたちつてとなにぬねのまみむめもやゆよらりるれろわをん\nアイウエオカキクケコサシスセソタチツテトナニヌネノマミムメモヤユヨラリルレロワヲン\n가나다라마바사아자차카타파하한글빛꿈미래세계\n◇◆○◎■□※★☆✦✧';
+
+    const glyphs = chars.replace(/\s+/g, '');
+
     const fs = isMobile ? 16 : 14;
     let cols = Math.floor(width / fs);
     let drops = Array(cols).fill(1);
@@ -482,13 +486,13 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
       ctx.fillRect(0, 0, width, height);
 
       ctx.fillStyle = 'rgba(255,255,255,0.42)';
-      ctx.font = `${fs}px "Orbitron"`;
+      ctx.font = `${fs}px "Satoshi", system-ui, -apple-system, Segoe UI, sans-serif`;
 
       cols = Math.floor(width / fs);
       if (drops.length !== cols) drops = Array(cols).fill(1);
 
       drops.forEach((d, i) => {
-        const text = chars[Math.floor(Math.random() * chars.length)];
+        const text = glyphs[Math.floor(Math.random() * glyphs.length)];
         ctx.fillText(text, i * fs, d * fs);
         if (d * fs > height && Math.random() > 0.985) drops[i] = 0;
         drops[i]++;
