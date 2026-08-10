@@ -366,7 +366,7 @@ const CyberParticleSpace: React.FC<{ reducedMotion?: boolean; isPageVisible?: bo
       y: (Math.random() - 0.5) * 380,
       z: Math.random() * 420,
       size: Math.random() * 1.2 + 0.4,
-      color: Math.random() > 0.5 ? 'rgba(96, 165, 250, 0.35)' : 'rgba(255, 114, 210, 0.28)'
+      color: Math.random() > 0.5 ? 'rgba(96, 165, 250, 0.28)' : 'rgba(255, 114, 210, 0.20)'
     }));
 
     let rotationAngle = 0;
@@ -384,7 +384,7 @@ const CyberParticleSpace: React.FC<{ reducedMotion?: boolean; isPageVisible?: bo
         return;
       }
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.10)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
       ctx.fillRect(0, 0, width, height);
 
       const m = mouseRef.current;
@@ -469,15 +469,23 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
     if (canvas.parentElement) resizeObserver.observe(canvas.parentElement);
 
     // Mixed CJK glyphs (Chinese Han, Japanese Hiragana/Katakana, Korean Hangul) + a few symbols.
-    const chars = '天地玄黄宇宙洪荒日月盈昃辰宿列張寒來暑往秋收冬藏金木水火土山川風林海光影夢幻未来世界電脳\nあいうえおかきくけこさしすせそたちつてとなにぬねのまみむめもやゆよらりるれろわをん\nアイウエオカキクケコサシスセソタチツテトナニヌネノマミムメモヤユヨラリルレロワヲン\n가나다라마바사아자차카타파하한글빛꿈미래세계\n◇◆○◎■□※★☆✦✧';
-
+    const chars = '天地玄黄宇宙洪荒日月盈昃辰宿列張寒來暑往秋収冬蔵金木水火土山川風林海光影夢幻未来世界電脳\nあいうえおかきくけこさしすせそたちつてとなにぬねのまみむめもやゆよらりるれろわをん\nアイウエオカキクケコサシスセソタチツテトナニヌネノマミムメモヤユヨラリルレロワヲン\n가나다라마바사아자차카타파하한글빛꿈미래세계\n◇◆○◎■□※★☆✦✧';
     const glyphs = chars.replace(/\s+/g, '');
 
-    const fs = isMobile ? 16 : 14;
-    let cols = Math.floor(width / fs);
+    // Softer “structured” rain: fewer columns, slower speed, colorful glyphs.
+    const fontSize = isMobile ? 18 : 16;
+    let cols = Math.floor(width / fontSize);
     let drops = Array(cols).fill(1);
 
-    const intervalMs = isMobile ? 95 : 65;
+    const palette = [
+      'rgba(255,114,210,0.55)',
+      'rgba(34,211,238,0.55)',
+      'rgba(168,85,247,0.52)',
+      'rgba(96,165,250,0.50)',
+      'rgba(255,255,255,0.40)'
+    ];
+
+    const intervalMs = isMobile ? 110 : 80;
 
     const interval = window.setInterval(() => {
       if (!isPageVisible) return;
@@ -485,16 +493,18 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
       ctx.fillStyle = alpha;
       ctx.fillRect(0, 0, width, height);
 
-      ctx.fillStyle = 'rgba(255,255,255,0.42)';
-      ctx.font = `${fs}px "Satoshi", system-ui, -apple-system, Segoe UI, sans-serif`;
+      ctx.font = `${fontSize}px "Satoshi", system-ui, -apple-system, Segoe UI, sans-serif`;
 
-      cols = Math.floor(width / fs);
+      cols = Math.floor(width / fontSize);
       if (drops.length !== cols) drops = Array(cols).fill(1);
 
       drops.forEach((d, i) => {
-        const text = glyphs[Math.floor(Math.random() * glyphs.length)];
-        ctx.fillText(text, i * fs, d * fs);
-        if (d * fs > height && Math.random() > 0.985) drops[i] = 0;
+        const glyph = glyphs[Math.floor(Math.random() * glyphs.length)];
+        ctx.fillStyle = palette[(i + Math.floor(Math.random() * 3)) % palette.length];
+        ctx.fillText(glyph, i * fontSize, d * fontSize);
+
+        // Less “glitchy”: longer streams, fewer resets.
+        if (d * fontSize > height && Math.random() > 0.992) drops[i] = 0;
         drops[i]++;
       });
     }, intervalMs);
@@ -505,7 +515,7 @@ const MatrixRainStream: React.FC<MatrixRainProps> = ({ alpha = 'rgba(0, 0, 0, 0.
     };
   }, [alpha, reducedMotion, isPageVisible, isMobile]);
 
-  return <canvas ref={canvasRef} id={canvasId} className="absolute inset-0 opacity-55 block pointer-events-none" />;
+  return <canvas ref={canvasRef} id={canvasId} className="absolute inset-0 block pointer-events-none premium-matrix-canvas" />;
 };
 
 const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: IconComponent, desc, image }) => {
@@ -560,9 +570,8 @@ const GameCard: React.FC<GameCardProps> = ({ title, badge, accentColor, icon: Ic
         />
         <div className="absolute inset-0 premium-media-scrim" />
 
-      
         <div
-          className={`relative z-10 p-3 rounded-full transition-all duration-700 ease-out flex items-center justify-center premium-icon-disc ${isHovered ? 'scale-110 rotate-6' : 'scale-100'}`}
+          className={`relative z-10 p-3 transition-all duration-700 ease-out flex items-center justify-center premium-icon-disc ${isHovered ? 'scale-110 rotate-6' : 'scale-100'}`}
           style={{
             boxShadow: isHovered ? `0 0 28px ${lightGlowTheme}40` : 'none'
           }}
@@ -638,23 +647,16 @@ const SkillCard: React.FC<SkillCardProps> = ({ name, icon, level, accent }) => {
   }[accent];
 
   return (
-    <div
-      ref={cardRef}
-      className="relative group p-5 text-center transition-all duration-300 transform hover:-translate-y-[4px] premium-surface-card"
-    >
+    <div ref={cardRef} className="relative group p-5 text-center transition-all duration-300 transform hover:-translate-y-[4px] premium-surface-card">
       <div className="text-3xl mb-3 select-none">{icon}</div>
-      <div className="font-main text-[11px] font-bold tracking-widest uppercase mb-2 text-white/85">
-        {name}
-      </div>
-      <div className="w-full bg-white/10 h-[3px] rounded-full mt-3 overflow-hidden">
+      <div className="font-main text-[11px] font-bold tracking-widest uppercase mb-2 text-white/85">{name}</div>
+      <div className="w-full bg-white/10 h-[3px] mt-3 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r rounded-full transition-all duration-300"
+          className="h-full bg-gradient-to-r transition-all duration-300"
           style={{ width: `${percent}%`, backgroundImage: `linear-gradient(90deg, ${accentColor}, rgba(255,255,255,0.65))` }}
         />
       </div>
-      <div className="text-[10px] text-white/55 mt-2 text-right">
-        {percent}% CAP
-      </div>
+      <div className="text-[10px] text-white/55 mt-2 text-right">{percent}% CAP</div>
     </div>
   );
 };
@@ -670,7 +672,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName, i
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
         <div className="absolute inset-0 premium-media-scrim" />
-        <span className="absolute bottom-3 right-3 text-xl opacity-90 select-none bg-white/10 p-1.5 rounded-full border border-white/15 z-10">{iconName}</span>
+        <span className="absolute bottom-3 right-3 text-xl opacity-90 select-none bg-white/10 p-1.5 z-10">{iconName}</span>
       </div>
 
       <div className="text-[10px] text-white/50 tracking-widest mb-1">{num}</div>
@@ -680,7 +682,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ num, title, desc, iconName, i
       <a
         href="#"
         onClick={(e) => e.preventDefault()}
-        className="inline-flex items-center gap-2 px-4 py-2 text-[10px] font-main font-bold tracking-widest text-white/90 border border-white/20 hover:border-white/35 hover:bg-white/5 transition-all duration-300 rounded-full"
+        className="inline-flex items-center gap-2 px-4 py-2 text-[10px] font-main font-bold tracking-widest text-white/90 hover:bg-white/5 transition-all duration-300"
       >
         &#9654; VIEW DEMO
       </a>
@@ -762,7 +764,7 @@ export default function App() {
       );
       gsap.to('.premium-aurora-field', {
         backgroundPosition: '60% 40%',
-        duration: 20,
+        duration: 18,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut'
@@ -832,8 +834,8 @@ export default function App() {
         const rect = target.getBoundingClientRect();
         const isInside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
         if (!isInside) return;
-        const rotateX = ((event.clientY - rect.top) / rect.height - 0.5) * -6;
-        const rotateY = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
+        const rotateX = ((event.clientY - rect.top) / rect.height - 0.5) * -5;
+        const rotateY = ((event.clientX - rect.left) / rect.width - 0.5) * 5;
         target.style.setProperty('--tilt-x', `${rotateX}deg`);
         target.style.setProperty('--tilt-y', `${rotateY}deg`);
         target.style.setProperty('--tilt-glow-x', `${event.clientX - rect.left}px`);
@@ -944,14 +946,14 @@ export default function App() {
 
       {isLoading && (
         <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 premium-boot-screen">
-          <MatrixRainStream canvasId="loading-matrix" alpha="rgba(0,0,0,0.08)" reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} />
+          <MatrixRainStream canvasId="loading-matrix" alpha="rgba(0,0,0,0.07)" reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} />
 
           <div className="relative z-10 text-center max-w-md w-full">
             <h1 className="font-main text-2xl md:text-4xl font-black tracking-[0.18em] mb-8 premium-boot-title" data-text="NOOBMKGAMER">
               NOOBMKGAMER
             </h1>
 
-            <div className="space-y-2 text-[11px] text-left premium-boot-panel rounded-xl mb-8">
+            <div className="space-y-2 text-[11px] text-left premium-boot-panel mb-8">
               <div className="text-white/85">&gt; INITIALIZING DOMAIN CORE ENGINE...</div>
               {loadPercentage > 25 && <div className="text-white/70">&gt; SCANNING COMPILER AND DIRECTIVES... OK</div>}
               {loadPercentage > 50 && <div className="text-white/70">&gt; LINKING FEATURED GAME CARDS BLUEPRINTS... OK</div>}
@@ -959,12 +961,10 @@ export default function App() {
               {loadPercentage >= 100 && <div className="text-white/85">&gt; SHIELD PROTOCOLS ACCESS GRANTED ... READY</div>}
             </div>
 
-            <div className="w-full h-[4px] rounded-full overflow-hidden premium-progress-track">
+            <div className="w-full h-[4px] overflow-hidden premium-progress-track">
               <div className="h-full premium-progress-fill" style={{ width: `${loadPercentage}%` }} />
             </div>
-            <div className="text-right text-[10px] mt-3 text-white/50 tracking-wide">
-              CORE LINK: {loadPercentage}%
-            </div>
+            <div className="text-right text-[10px] mt-3 text-white/50 tracking-wide">CORE LINK: {loadPercentage}%</div>
           </div>
         </div>
       )}
@@ -1001,14 +1001,13 @@ export default function App() {
                   className="text-[11px] tracking-widest text-white/70 hover:text-white duration-300 uppercase relative block py-2 md:py-0 group"
                 >
                   {sect}
-                  <span className="absolute bottom-[-3px] left-0 right-0 h-[1.5px] bg-white/70 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
                 </a>
               </li>
             ))}
           </ul>
 
           <div className="hidden md:flex items-center gap-2 text-[11px] text-white/70">
-            <div className="status-dot w-2 h-2 rounded-full bg-white/70 shadow-[0_0_18px_rgba(255,255,255,0.25)]" />
+            <div className="status-dot w-2 h-2 bg-white/70 shadow-[0_0_18px_rgba(255,255,255,0.25)]" />
             SYSTEM: ONLINE
           </div>
         </div>
@@ -1026,9 +1025,7 @@ export default function App() {
         <CyberParticleSpace reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} />
 
         <div className="relative z-10 text-center px-6 max-w-4xl premium-hero-panel">
-          <div className="text-[11px] text-white/70 tracking-[0.3em] uppercase mb-4">
-            &lt; WELCOME TO THE DOMAIN &gt;
-          </div>
+          <div className="text-[11px] text-white/75 tracking-[0.28em] uppercase mb-4">&lt; WELCOME TO THE DOMAIN &gt;</div>
 
           <h1 className="font-main font-black text-4xl md:text-7xl leading-tight tracking-[0.02em] uppercase mb-6">
             <span className="block text-white/95">WELCOME TO</span>
@@ -1036,24 +1033,18 @@ export default function App() {
             <span className="block text-white/95">DOMAIN</span>
           </h1>
 
-          <div className="font-main text-[10px] md:text-sm text-white/70 tracking-[0.22em] mb-12 font-semibold">
-            <span className="text-white/85">GAMER</span> &nbsp;&bull;&nbsp; <span>CREATOR</span> &nbsp;&bull;&nbsp; <span className="text-white/85">DIGITAL EXPLORER</span>
+          <div className="font-main text-[10px] md:text-sm text-white/80 tracking-[0.22em] mb-12 font-semibold">
+            <span className="text-white/90">GAMER</span> &nbsp;&bull;&nbsp; <span>CREATOR</span> &nbsp;&bull;&nbsp; <span className="text-white/90">DIGITAL EXPLORER</span>
           </div>
 
           <div className="flex flex-wrap gap-4 justify-center">
             <MagneticAnchor>
-              <button
-                onClick={handleEnterDomain}
-                className="px-8 py-3 text-xs font-main font-bold tracking-[0.14em] uppercase text-white premium-btn premium-btn-primary"
-              >
+              <button onClick={handleEnterDomain} className="px-8 py-3 text-xs font-main font-bold tracking-[0.14em] uppercase text-white premium-btn premium-btn-primary">
                 Enter Domain
               </button>
             </MagneticAnchor>
             <MagneticAnchor>
-              <button
-                onClick={handleWatchContent}
-                className="px-8 py-3 text-xs font-main font-bold tracking-[0.14em] uppercase text-white premium-btn premium-btn-secondary"
-              >
+              <button onClick={handleWatchContent} className="px-8 py-3 text-xs font-main font-bold tracking-[0.14em] uppercase text-white premium-btn premium-btn-secondary">
                 &#9654; Watch Content
               </button>
             </MagneticAnchor>
@@ -1065,22 +1056,18 @@ export default function App() {
             <div className="relative p-10 max-w-md w-full premium-transition-panel">
               <Terminal className="w-12 h-12 text-white/85 mb-4" />
 
-              <div className="font-main text-lg font-black text-white tracking-widest uppercase mb-2">
-                MK SECURITY PORTAL
-              </div>
+              <div className="font-main text-lg font-black text-white tracking-widest uppercase mb-2">MK SECURITY PORTAL</div>
 
-              <div className="text-[10px] text-white/70 uppercase tracking-[0.2em] mb-4">
-                AUTHENTICATING DOMAIN...
-              </div>
+              <div className="text-[10px] text-white/70 uppercase tracking-[0.2em] mb-4">AUTHENTICATING DOMAIN...</div>
 
-              <div className="w-full p-4 text-[10px] text-left text-white/75 space-y-2 h-28 overflow-hidden rounded-lg premium-transition-log">
+              <div className="w-full p-4 text-[10px] text-left text-white/75 space-y-2 h-28 overflow-hidden premium-transition-log">
                 <div className="text-white font-semibold">&gt; {transitionStep}</div>
                 <div className="opacity-70">&gt; IP_LOC: INGRESS INTERFACE_GRANTED</div>
                 <div className="opacity-55">&gt; SYS_DECRYPT: RSA_2048 SECURE PROTOCOL</div>
                 <div className="opacity-40">&gt; CONNECT: STATUS_LIVE_READY</div>
               </div>
 
-              <div className="w-full h-1 mt-6 overflow-hidden rounded-full premium-progress-track">
+              <div className="w-full h-1 mt-6 overflow-hidden premium-progress-track">
                 <div className="premium-progress-fill premium-progress-anim" />
               </div>
             </div>
@@ -1088,9 +1075,9 @@ export default function App() {
         )}
 
         {!enteredDomain && (
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-60">
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-70">
             <span className="text-[9px] text-white/70 tracking-widest">SYSTEM SECURED</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.25)]" />
+            <div className="w-1.5 h-1.5 bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.25)]" />
           </div>
         )}
       </section>
@@ -1122,9 +1109,7 @@ export default function App() {
             </div>
 
             <div className="relative p-8 premium-surface-panel">
-              <h3 className="font-main text-lg md:text-2xl font-black text-white mb-3">
-                NoobMKGamer
-              </h3>
+              <h3 className="font-main text-lg md:text-2xl font-black text-white mb-3">NoobMKGamer</h3>
               <p className="font-body text-[14px] text-white/75 leading-relaxed italic mb-6">
                 &quot;A gamer forged in competitive battlegrounds with limitless possibilities — where strategy meets instinct and victories are written in code.&quot;
               </p>
@@ -1229,9 +1214,7 @@ export default function App() {
 
           <div className="bg-gradient-to-br from-white/8 to-white/3 border border-white/12 p-12 relative overflow-hidden group rounded-[28px] premium-surface-panel">
             <div className="relative z-10">
-              <div className="font-main text-sm text-white/45 tracking-widest mb-6">
-                [ OFFICIAL GAMING STREAM ARCHIVE ]
-              </div>
+              <div className="font-main text-sm text-white/45 tracking-widest mb-6">[ OFFICIAL GAMING STREAM ARCHIVE ]</div>
               <p className="font-body text-white/75 text-sm md:text-base leading-relaxed mb-10 max-w-xl mx-auto">
                 Join the digital revolution. Watch epic gameplay, pro strategies, clutch moments, and exclusive gaming content — straight from NoobMKGamer&apos;s domain.
               </p>
@@ -1239,7 +1222,7 @@ export default function App() {
               <div>
                 <a href="https://youtube.com/@NoobMKGamer" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-8 py-4 font-main font-bold text-xs tracking-widest text-white premium-btn premium-btn-youtube">
                   <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                   </svg>
                   VISIT MY CHANNEL
                 </a>
