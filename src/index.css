@@ -17,22 +17,16 @@
   --premium-pink: #ff72d2;
   --premium-cyan: #22d3ee;
 
-  --bg-0: #050614;
-
   --spotlight-x: 50vw;
   --spotlight-y: 50vh;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
-/* More colorful base (2nd page + overall) */
+/* Colorful base (avoid dull/flat black screens) */
 body {
   font-family: var(--font-body);
   color: rgba(255,255,255,0.92);
@@ -70,24 +64,65 @@ body::before {
 .premium-app-shell { isolation: isolate; }
 .premium-app-shell.entered-domain { padding-top: 18px; }
 
-.premium-divider { height: 0; margin: 0; border: 0; }
+/* Remove divider artifacts */
+.premium-divider { display: none !important; }
 
-/* Top wash to avoid dull black band */
-.premium-first-section { position: relative; }
-.premium-first-section::before {
-  content: "";
-  position: absolute;
-  inset: -120px -40px auto -40px;
-  height: 240px;
-  background:
-    radial-gradient(700px circle at 20% 20%, rgba(34,211,238,0.22), transparent 58%),
-    radial-gradient(700px circle at 78% 35%, rgba(255,114,210,0.20), transparent 58%),
-    radial-gradient(520px circle at 55% 10%, rgba(96,165,250,0.18), transparent 60%);
-  filter: blur(24px);
-  opacity: 0.95;
-  pointer-events: none;
-  z-index: -1;
-}
+/* Fix any remaining line borders in content */
+* { outline-color: transparent; }
+
+/* Hide all 1px underline “line” decorations (nav + section headers) */
+nav a span,
+.premium-section-title + div { display: none !important; }
+
+/* Remove row separator lines in profile table (were border-b utilities) */
+#profile .border-b { border-bottom: none !important; }
+
+/* Remove any remaining borders globally (user request) */
+.premium-nav,
+.premium-nav-menu,
+.premium-hero-panel,
+.premium-surface-panel,
+.premium-surface-card,
+.premium-media-frame,
+.premium-icon-disc,
+.premium-badge,
+.premium-btn,
+.premium-input,
+.game-card,
+#skills .grid > div,
+#projects .grid > div,
+#youtube .bg-gradient-to-br,
+#contact > div > div:last-child,
+#profile .grid > div:last-child,
+#profile .group\/profile-img,
+footer a,
+button,
+input,
+textarea { border: none !important; }
+
+/* Keep “no round boxes” */
+.premium-nav,
+.premium-nav-menu,
+.premium-hero-panel,
+.premium-surface-panel,
+.premium-surface-card,
+.premium-media-frame,
+.premium-icon-disc,
+.premium-badge,
+.premium-btn,
+.premium-input,
+.game-card,
+#skills .grid > div,
+#projects .grid > div,
+#youtube .bg-gradient-to-br,
+#contact > div > div:last-child,
+#profile .grid > div:last-child,
+#profile .group\/profile-img,
+footer a,
+button,
+input,
+textarea,
+img { border-radius: 0 !important; }
 
 /* Fixed layers */
 .premium-three-backdrop,
@@ -98,17 +133,6 @@ body::before {
 
 .premium-three-backdrop { z-index: 0; opacity: 0.60; filter: saturate(1.35) brightness(1.08); }
 .premium-three-canvas { width: 100%; height: 100%; display: block; }
-
-.premium-three-fallback::before {
-  content: "";
-  position: absolute;
-  inset: 8% 4%;
-  background:
-    radial-gradient(circle at 30% 40%, rgba(96, 165, 250, 0.24), transparent 36%),
-    radial-gradient(circle at 70% 25%, rgba(255, 114, 210, 0.20), transparent 34%),
-    radial-gradient(ellipse at 50% 80%, rgba(34, 211, 238, 0.18), transparent 40%);
-  filter: blur(54px);
-}
 
 .premium-aurora-field {
   z-index: 0;
@@ -174,197 +198,62 @@ body::before {
   opacity: 0.55;
 }
 
-/* Cursor */
-#cursor {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  background: rgba(255,255,255,0.78);
-  border-radius: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate3d(-100px,-100px,0);
-  box-shadow: 0 0 18px rgba(34,211,238,0.18), 0 0 28px rgba(255,114,210,0.14);
+/* Landing/welcome page: combine hero + matrix into a structured, polished look */
+#hero {
+  background:
+    radial-gradient(900px circle at 50% 20%, rgba(255,255,255,0.08), transparent 50%),
+    radial-gradient(900px circle at 18% 10%, rgba(255,114,210,0.20), transparent 55%),
+    radial-gradient(900px circle at 82% 12%, rgba(34,211,238,0.18), transparent 55%),
+    linear-gradient(180deg, rgba(7,8,25,0.90), rgba(0,0,0,0.92));
 }
 
-#cursor-ring {
-  position: fixed;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 0;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate3d(-100px,-100px,0);
-  box-shadow: 0 0 38px rgba(168,85,247,0.12);
-}
-
-/* ================================
-   REMOVE ALL ROUND BOXES + OUTLINES
-   ================================ */
-
-/* Force “no round boxes” everywhere relevant */
-.premium-nav,
-.premium-nav-menu,
-.premium-hero-panel,
-.premium-surface-panel,
-.premium-surface-card,
-.premium-media-frame,
-.premium-icon-disc,
-.premium-badge,
-.premium-btn,
-.premium-input,
-.game-card,
-#skills .grid > div,
-#projects .grid > div,
-#youtube .bg-gradient-to-br,
-#contact > div > div:last-child,
-#profile .grid > div:last-child,
-#profile .group\/profile-img,
-footer a,
-footer div,
-nav a,
-button,
-input,
-textarea,
-img {
-  border-radius: 0 !important;
-}
-
-/* Remove outlines/borders globally for “boxes” */
-.premium-nav,
-.premium-nav-menu,
-.premium-hero-panel,
-.premium-surface-panel,
-.premium-surface-card,
-.premium-media-frame,
-.premium-icon-disc,
-.premium-badge,
-.premium-btn,
-.premium-input,
-.game-card,
-#skills .grid > div,
-#projects .grid > div,
-#youtube .bg-gradient-to-br,
-#contact > div > div:last-child,
-#profile .grid > div:last-child,
-#profile .group\/profile-img,
-footer a,
-button,
-input,
-textarea {
-  border: none !important;
-  outline: none !important;
-}
-
-/* Keep glass feel via background + shadow only */
-.premium-nav {
-  margin: 12px auto 0;
-  left: 12px;
-  right: 12px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05));
-  box-shadow: 0 26px 90px rgba(0,0,0,0.35), 0 0 80px rgba(34,211,238,0.10);
-  backdrop-filter: blur(26px) saturate(1.7);
-}
-
-.premium-nav-menu {
-  background: rgba(0,0,0,0.42);
-  backdrop-filter: blur(18px);
-}
-
+/* Keep the hero “panel” but without harsh box edges */
 .premium-hero-panel {
   padding: clamp(2rem, 5vw, 5rem);
-  background: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.045));
-  box-shadow: 0 70px 210px rgba(0,0,0,0.48), 0 0 160px rgba(255,114,210,0.16);
-  backdrop-filter: blur(28px) saturate(1.6);
+  background: rgba(0,0,0,0.16);
+  box-shadow: 0 70px 210px rgba(0,0,0,0.45), 0 0 160px rgba(255,114,210,0.14);
+  backdrop-filter: blur(18px) saturate(1.4);
 }
-
-.premium-surface-panel,
-.premium-surface-card {
-  background: linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05));
-  box-shadow: 0 36px 120px rgba(0,0,0,0.34), 0 0 90px rgba(34,211,238,0.08);
-  backdrop-filter: blur(22px) saturate(1.45);
-}
-
-.premium-media-frame {
-  background: rgba(255,255,255,0.05);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-}
-
-.premium-badge { background: rgba(0,0,0,0.18); color: rgba(255,255,255,0.82); }
-
-.premium-btn {
-  background: rgba(255,255,255,0.10);
-  box-shadow: 0 18px 60px rgba(0,0,0,0.30);
-  backdrop-filter: blur(14px) saturate(1.45);
-  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s cubic-bezier(0.22,1,0.36,1), background 0.35s ease;
-}
-
-.premium-btn-primary { background: linear-gradient(135deg, rgba(255,114,210,0.22), rgba(34,211,238,0.18), rgba(168,85,247,0.16)); }
-.premium-btn-secondary { background: rgba(255,255,255,0.10); }
-.premium-btn-youtube { background: linear-gradient(135deg, rgba(255,0,0,0.92), rgba(214,0,0,0.92)); }
-
-.premium-btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.32) 42%, transparent 58%);
-  transform: translateX(-130%);
-  transition: transform 0.75s cubic-bezier(0.22,1,0.36,1);
-  pointer-events: none;
-}
-
-.premium-btn:hover::after { transform: translateX(130%); }
-.premium-btn:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 28px 90px rgba(0,0,0,0.42); }
-.premium-btn:active { transform: translateY(-1px) scale(0.995); }
-
-.premium-input {
-  background: rgba(255,255,255,0.10);
-  color: rgba(255,255,255,0.92);
-  backdrop-filter: blur(16px);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-  padding: 16px;
-}
-
-.premium-input:focus {
-  background: rgba(34,211,238,0.08);
-  box-shadow: 0 0 34px rgba(255,114,210,0.12);
-}
-
-.premium-input::placeholder { color: rgba(255,255,255,0.42); }
 
 /* Sections */
 section { position: relative; z-index: 3; overflow: hidden; background: transparent !important; padding-top: clamp(3rem, 7vw, 5.2rem) !important; padding-bottom: clamp(3rem, 7vw, 5.2rem) !important; }
 section::before { display: none; }
 
-/* Remove the tiny underline bars under section headings */
-.premium-section-title + div { display: none !important; }
+/* Surfaces: shadow + subtle fill only */
+.premium-nav { margin: 12px auto 0; left: 12px; right: 12px; background: rgba(0,0,0,0.12); box-shadow: 0 26px 90px rgba(0,0,0,0.32), 0 0 80px rgba(34,211,238,0.10); backdrop-filter: blur(18px) saturate(1.6); }
+.premium-nav-menu { background: rgba(0,0,0,0.34); backdrop-filter: blur(16px); }
 
-/* Boot screen */
-.premium-boot-screen {
-  background:
-    radial-gradient(circle at 50% 20%, rgba(255,255,255,0.10), transparent 40%),
-    radial-gradient(circle at 18% 12%, rgba(255,114,210,0.24), transparent 46%),
-    radial-gradient(circle at 82% 14%, rgba(34,211,238,0.22), transparent 46%),
-    radial-gradient(circle at 55% 80%, rgba(168,85,247,0.20), transparent 54%),
-    linear-gradient(180deg, rgba(7,8,25,0.94), rgba(0,0,0,0.92));
+.premium-surface-panel,
+.premium-surface-card { background: rgba(0,0,0,0.10); box-shadow: 0 36px 120px rgba(0,0,0,0.30), 0 0 90px rgba(34,211,238,0.07); backdrop-filter: blur(16px) saturate(1.35); }
+
+.premium-media-frame { background: rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+.premium-media-scrim { background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.10), rgba(0,0,0,0.36) 60%, rgba(0,0,0,0.52)); }
+
+.premium-btn { background: rgba(255,255,255,0.10); box-shadow: 0 18px 60px rgba(0,0,0,0.26); backdrop-filter: blur(14px) saturate(1.45); transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s cubic-bezier(0.22,1,0.36,1), background 0.35s ease; }
+
+.premium-btn-primary { background: linear-gradient(135deg, rgba(255,114,210,0.22), rgba(34,211,238,0.18), rgba(168,85,247,0.16)); }
+.premium-btn-secondary { background: rgba(255,255,255,0.10); }
+.premium-btn-youtube { background: linear-gradient(135deg, rgba(255,0,0,0.92), rgba(214,0,0,0.92)); }
+
+.premium-btn:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 28px 90px rgba(0,0,0,0.38); }
+.premium-btn:active { transform: translateY(-1px) scale(0.995); }
+
+.premium-input { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.92); backdrop-filter: blur(16px); padding: 16px; }
+.premium-input:focus { background: rgba(34,211,238,0.08); box-shadow: 0 0 34px rgba(255,114,210,0.12); }
+.premium-input::placeholder { color: rgba(255,255,255,0.42); }
+
+/* Remove “words/symbols” at the bottom of the 3rd page (footer social buttons) without changing links */
+footer .w-10.h-10 {
+  font-size: 0 !important;
+  color: transparent !important;
+  text-shadow: none !important;
 }
-
-.premium-boot-panel { background: rgba(0,0,0,0.28); backdrop-filter: blur(18px); padding: 16px; box-shadow: 0 28px 90px rgba(0,0,0,0.42); }
-
-.premium-progress-track { background: rgba(255,255,255,0.10); }
-.premium-progress-fill { background: linear-gradient(90deg, rgba(255,114,210,1), rgba(34,211,238,1), rgba(168,85,247,1)); box-shadow: 0 0 26px rgba(34,211,238,0.20); }
-
-/* Transition overlay */
-.premium-transition { background: rgba(0,0,0,0.50); backdrop-filter: blur(10px); }
-.premium-transition-panel { background: linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.055)); box-shadow: 0 60px 180px rgba(0,0,0,0.52); backdrop-filter: blur(24px) saturate(1.5); }
-.premium-transition-log { background: rgba(0,0,0,0.28); }
 
 /* Typography */
 h1, h2, h3, .font-main { font-family: var(--font-main); font-weight: 900; }
 .font-body { font-family: var(--font-body); }
 
-/* Tilt glow: keep glow but no outlines */
+/* Tilt glow: keep but no hard lines */
 .game-card,
 #skills .grid > div,
 #projects .grid > div,
