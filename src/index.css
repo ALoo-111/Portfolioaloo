@@ -775,3 +775,60 @@ h1, h2, h3, .font-main { font-family: var(--font-main); font-weight: 900; }
   .nx-boot-decor,
   .nx-hero-decor { display: none; }
 }
+
+
+/* NX MOBILE PATCH: keep narrow embedded/mobile viewports readable and transitions isolated */
+.nx-hero-transitioning .nx-hero-panel,
+.nx-hero-transitioning .nx-system-secured {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateZ(0) scale(0.96);
+}
+
+.nx-transition-overlay {
+  z-index: 100 !important;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(168,85,247,0.24), transparent 34%),
+    linear-gradient(145deg, rgba(3,5,20,0.98), rgba(12,5,32,0.97) 52%, rgba(2,12,25,0.98));
+  backdrop-filter: blur(16px) saturate(1.28);
+}
+
+.nx-transition-panel {
+  width: min(100%, 26rem);
+  margin-inline: auto;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.24),
+    inset 0 -1px 0 rgba(34,211,238,0.18),
+    0 30px 100px rgba(0,0,0,0.62),
+    0 0 70px rgba(168,85,247,0.24);
+}
+
+@media (max-width: 768px) {
+  .nx-boot-content {
+    width: calc(100vw - 1.5rem);
+    max-width: none;
+    padding-inline: 0.25rem;
+  }
+
+  .nx-rainbow-title {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+    white-space: nowrap;
+    font-size: clamp(1rem, 6.2vw, 2rem) !important;
+    letter-spacing: clamp(0.05em, 1.6vw, 0.16em) !important;
+  }
+
+  .nx-hero-title {
+    font-size: clamp(1.35rem, 8vw, 2.3rem) !important;
+    letter-spacing: 0 !important;
+    line-height: 1.08;
+  }
+
+  .nx-transition-panel {
+    width: calc(100vw - 1.5rem);
+    max-width: none;
+    padding: 1.45rem 1rem;
+  }
+}

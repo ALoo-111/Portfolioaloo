@@ -1031,7 +1031,7 @@ export default function App() {
 
       <section
         id="hero"
-        className={`transition-all duration-[1200ms] ease-out flex items-center justify-center overflow-hidden nx-hero-screen ${
+        className={`transition-all duration-[1200ms] ease-out flex items-center justify-center overflow-hidden nx-hero-screen ${isTransitioning ? 'nx-hero-transitioning' : ''} ${
           !enteredDomain
             ? "fixed inset-0 z-[95] w-screen h-screen pt-16"
             : "hidden"
