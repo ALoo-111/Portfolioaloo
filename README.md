@@ -142,21 +142,7 @@ For the launch experience, preserve the following contracts when making changes:
 - The existing `handleEnterDomain` and `handleWatchContent` handlers control the two hero actions.
 - Page 3 contains the main portfolio content and should remain functionally independent of the launch visuals.
 
-## Project status
-
-The portfolio is an active personal showcase. The main experience, responsive mobile treatment, animated hero background, game and project cards, YouTube callout, and contact flow are implemented. There is currently no automated CI workflow or license file in the repository; add both before adopting this project as a distributed starter or open-source template.
-
-## Contributing
-
-Suggestions and focused improvements are welcome. Before opening a pull request, run the type check and production build, keep changes scoped to the requested surface, preserve the mobile layout, and verify that reduced-motion behavior still works. For larger visual changes, include a short before-and-after description and screenshots in the pull request.
 
 ## Contact
 
 The primary public touchpoint is the [NoobMKGamer YouTube channel](https://youtube.com/@NoobMKGamer). For repository-specific issues, use [GitHub Issues](https://github.com/ALoo-111/Portfolioaloo/issues).
-
-## References
-
-[1]: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes "GitHub Docs — About README files"
-[2]: https://github.com/othneildrew/Best-README-Template "Best-README-Template — README structure reference"
-
-This README follows GitHub’s guidance for communicating a project’s purpose, usefulness, setup path, support channel, and maintainership, while adapting the section hierarchy and presentation patterns demonstrated by the referenced template [1] [2].
