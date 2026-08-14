@@ -945,15 +945,31 @@ export default function App() {
       <div id="cursor-ring" ref={cursorRingElRef} className="hidden md:block" />
 
       {isLoading && (
-        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 premium-boot-screen">
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 premium-boot-screen nx-boot-screen">
           <MatrixRainStream canvasId="loading-matrix" alpha="rgba(0,0,0,0.07)" reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} />
 
-          <div className="relative z-10 text-center max-w-md w-full">
-            <h1 className="font-main text-2xl md:text-4xl font-black tracking-[0.18em] mb-8 premium-boot-title" data-text="NOOBMKGAMER">
+          <div className="nx-boot-decor" aria-hidden="true">
+            <div className="nx-boot-aurora nx-boot-aurora-one" />
+            <div className="nx-boot-aurora nx-boot-aurora-two" />
+            <div className="nx-orbit nx-orbit-a" />
+            <div className="nx-orbit nx-orbit-b" />
+            <div className="nx-orbit nx-orbit-c" />
+            <div className="nx-cube" aria-hidden="true">
+              <span className="nx-cube-face nx-cube-front" />
+              <span className="nx-cube-face nx-cube-back" />
+              <span className="nx-cube-face nx-cube-right" />
+              <span className="nx-cube-face nx-cube-left" />
+              <span className="nx-cube-face nx-cube-top" />
+              <span className="nx-cube-face nx-cube-bottom" />
+            </div>
+          </div>
+
+          <div className="relative z-10 text-center max-w-md w-full nx-boot-content">
+            <h1 className="font-main text-2xl md:text-4xl font-black tracking-[0.18em] mb-8 premium-boot-title nx-rainbow-title" data-text="NOOBMKGAMER">
               NOOBMKGAMER
             </h1>
 
-            <div className="space-y-2 text-[11px] text-left premium-boot-panel mb-8">
+            <div className="space-y-2 text-[11px] text-left premium-boot-panel mb-8 nx-boot-panel">
               <div className="text-white/85">&gt; INITIALIZING DOMAIN CORE ENGINE...</div>
               {loadPercentage > 25 && <div className="text-white/70">&gt; SCANNING COMPILER AND DIRECTIVES... OK</div>}
               {loadPercentage > 50 && <div className="text-white/70">&gt; LINKING FEATURED GAME CARDS BLUEPRINTS... OK</div>}
@@ -961,8 +977,8 @@ export default function App() {
               {loadPercentage >= 100 && <div className="text-white/85">&gt; SHIELD PROTOCOLS ACCESS GRANTED ... READY</div>}
             </div>
 
-            <div className="w-full h-[4px] overflow-hidden premium-progress-track">
-              <div className="h-full premium-progress-fill" style={{ width: `${loadPercentage}%` }} />
+            <div className="w-full h-[4px] overflow-hidden premium-progress-track nx-progress-track">
+              <div className="h-full premium-progress-fill nx-progress-fill" style={{ width: `${loadPercentage}%` }} />
             </div>
             <div className="text-right text-[10px] mt-3 text-white/50 tracking-wide">CORE LINK: {loadPercentage}%</div>
           </div>
@@ -1015,7 +1031,7 @@ export default function App() {
 
       <section
         id="hero"
-        className={`transition-all duration-[1200ms] ease-out flex items-center justify-center overflow-hidden ${
+        className={`transition-all duration-[1200ms] ease-out flex items-center justify-center overflow-hidden nx-hero-screen ${
           !enteredDomain
             ? "fixed inset-0 z-[95] w-screen h-screen pt-16"
             : "hidden"
@@ -1024,10 +1040,22 @@ export default function App() {
         <MatrixRainStream canvasId="hero-matrix-canvas" reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} />
         <CyberParticleSpace reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} />
 
-        <div className="relative z-10 text-center px-6 max-w-4xl premium-hero-panel">
+        <div className="nx-hero-decor" aria-hidden="true">
+          <div className="nx-hero-blob nx-hero-blob-one" />
+          <div className="nx-hero-blob nx-hero-blob-two" />
+          <div className="nx-hero-grid-floor" />
+          <div className="nx-gyro">
+            <div className="nx-gyro-ring nx-gyro-ring-one" />
+            <div className="nx-gyro-ring nx-gyro-ring-two" />
+            <div className="nx-gyro-ring nx-gyro-ring-three" />
+            <div className="nx-gyro-core" />
+          </div>
+        </div>
+
+        <div className="relative z-10 text-center px-6 max-w-4xl premium-hero-panel nx-hero-panel">
           <div className="text-[11px] text-white/75 tracking-[0.28em] uppercase mb-4">&lt; WELCOME TO THE DOMAIN &gt;</div>
 
-          <h1 className="font-main font-black text-4xl md:text-7xl leading-tight tracking-[0.02em] uppercase mb-6">
+          <h1 className="font-main font-black text-4xl md:text-7xl leading-tight tracking-[0.02em] uppercase mb-6 nx-hero-title">
             <span className="block text-white/95">WELCOME TO</span>
             <span className="block text-white py-1">NOOBMKGAMER'S</span>
             <span className="block text-white/95">DOMAIN</span>
@@ -1039,12 +1067,12 @@ export default function App() {
 
           <div className="flex flex-wrap gap-4 justify-center">
             <MagneticAnchor>
-              <button onClick={handleEnterDomain} className="px-8 py-3 text-xs font-main font-bold tracking-[0.14em] uppercase text-white premium-btn premium-btn-primary">
+              <button onClick={handleEnterDomain} className="px-8 py-3 text-xs font-main font-bold tracking-[0.14em] uppercase text-white premium-btn premium-btn-primary nx-btn nx-btn-primary">
                 Enter Domain
               </button>
             </MagneticAnchor>
             <MagneticAnchor>
-              <button onClick={handleWatchContent} className="px-8 py-3 text-xs font-main font-bold tracking-[0.14em] uppercase text-white premium-btn premium-btn-secondary">
+              <button onClick={handleWatchContent} className="px-8 py-3 text-xs font-main font-bold tracking-[0.14em] uppercase text-white premium-btn premium-btn-secondary nx-btn nx-btn-secondary">
                 &#9654; Watch Content
               </button>
             </MagneticAnchor>
@@ -1052,8 +1080,8 @@ export default function App() {
         </div>
 
         {isTransitioning && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none premium-transition">
-            <div className="relative p-10 max-w-md w-full premium-transition-panel">
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none premium-transition nx-transition-overlay">
+            <div className="relative p-10 max-w-md w-full premium-transition-panel nx-transition-panel">
               <Terminal className="w-12 h-12 text-white/85 mb-4" />
 
               <div className="font-main text-lg font-black text-white tracking-widest uppercase mb-2">MK SECURITY PORTAL</div>
@@ -1075,7 +1103,7 @@ export default function App() {
         )}
 
         {!enteredDomain && (
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-70">
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-70 nx-system-secured">
             <span className="text-[9px] text-white/70 tracking-widest">SYSTEM SECURED</span>
             <div className="w-1.5 h-1.5 bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.25)]" />
           </div>
