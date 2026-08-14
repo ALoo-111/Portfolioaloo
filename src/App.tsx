@@ -1041,6 +1041,13 @@ export default function App() {
         <CyberParticleSpace reducedMotion={reducedMotion} isPageVisible={isPageVisible} isMobile={isMobile} />
 
         <div className="nx-hero-decor" aria-hidden="true">
+          <div className="nx-texture-field">
+            <div className="nx-texture-ribbon nx-texture-ribbon-one" />
+            <div className="nx-texture-ribbon nx-texture-ribbon-two" />
+            <div className="nx-texture-ribbon nx-texture-ribbon-three" />
+            <div className="nx-texture-glow nx-texture-glow-one" />
+            <div className="nx-texture-glow nx-texture-glow-two" />
+          </div>
           <div className="nx-hero-blob nx-hero-blob-one" />
           <div className="nx-hero-blob nx-hero-blob-two" />
           <div className="nx-hero-grid-floor" />
